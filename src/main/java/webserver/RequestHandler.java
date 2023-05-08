@@ -32,6 +32,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             String httpRequestMessage = getHttpRequestMessage(in);
+            debugHttpRequestMessage(httpRequestMessage);
 
             String url = getRequestUrlFrom(httpRequestMessage);
             byte[] body = Files.readAllBytes(new File(DEFAULT_PATH + url).toPath());
@@ -85,4 +86,7 @@ public class RequestHandler implements Runnable {
         return url;
     }
 
+    private void debugHttpRequestMessage(String httpRequestMessage) {
+        logger.debug("<< HTTP Request Message >>\n{}", httpRequestMessage);
+    }
 }
