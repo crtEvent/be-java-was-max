@@ -14,11 +14,10 @@ import java.nio.file.Files;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import config.WebConfig;
+
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
-    private static final String DEFAULT_PATH = "./src/main/resources/templates";
-    private static final String DEFAULT_URL = "/index.html";
 
     private final Socket connection;
 
@@ -35,7 +34,7 @@ public class RequestHandler implements Runnable {
             debugHttpRequestMessage(httpRequestMessage);
 
             String url = getRequestUrlFrom(httpRequestMessage);
-            byte[] body = Files.readAllBytes(new File(DEFAULT_PATH + url).toPath());
+            byte[] body = Files.readAllBytes(new File(WebConfig.DEFAULT_PATH + url).toPath());
 
             DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, body.length);
@@ -80,7 +79,7 @@ public class RequestHandler implements Runnable {
     private String getRequestUrlFrom(String httpRequestMessage) {
         String url = httpRequestMessage.split(" ")[1];
         if(url.equals("/")) {
-            url = DEFAULT_URL;
+            url = WebConfig.DEFAULT_URL;
         }
 
         return url;
