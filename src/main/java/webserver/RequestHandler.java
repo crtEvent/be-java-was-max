@@ -31,13 +31,7 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            String requestLine = br.readLine();
-            String url = requestLine.split(" ")[1];
-            if(url.equals("/")) {
-                url = DEFAULT_URL;
-            }
-
+            String url = getRequestUrlFrom(in);
             byte[] body = Files.readAllBytes(new File(DEFAULT_PATH + url).toPath());
 
             DataOutputStream dos = new DataOutputStream(out);
@@ -66,5 +60,16 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private String getRequestUrlFrom(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        String requestLine = br.readLine();
+        String url = requestLine.split(" ")[1];
+        if(url.equals("/")) {
+            url = DEFAULT_URL;
+        }
+
+        return url;
     }
 }
