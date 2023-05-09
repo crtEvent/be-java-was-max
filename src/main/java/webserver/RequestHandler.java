@@ -32,7 +32,7 @@ public class RequestHandler implements Runnable {
             logger.debug("<< HTTP Request Message >>\n{}", myHttpRequestMessage.getHttpRequestMessage());
 
             String path = myHttpRequestMessage.getPath();
-            byte[] body = Files.readAllBytes(new File(WebConfig.DEFAULT_PATH + path).toPath());
+            byte[] body = Files.readAllBytes(new File(WebConfig.DEFAULT_TEMPLATES_PATH + path).toPath());
 
             DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, body.length);
