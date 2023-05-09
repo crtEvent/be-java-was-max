@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import config.WebConfig;
+import model.MyModel;
+import model.User;
 import webserver.request.MyHttpRequestMessage;
 
 public class RequestHandler implements Runnable {
@@ -31,12 +33,20 @@ public class RequestHandler implements Runnable {
             MyHttpRequestMessage myHttpRequestMessage = new MyHttpRequestMessage(in);
             logger.debug("<< HTTP Request Message >>\n{}", myHttpRequestMessage.getHttpRequestMessage());
 
-            String path = myHttpRequestMessage.getPath();
-            byte[] body = Files.readAllBytes(new File(WebConfig.DEFAULT_TEMPLATES_PATH + path).toPath());
+            if(myHttpRequestMessage.getQueryParams().size() > 0) {
+                MyModel myModel = new MyModel(myHttpRequestMessage.getQueryParams());
+                User user = new User(myModel.get("userId"), myModel.get("password"), myModel.get("name"), myModel.get("email"));
+                logger.debug("User : {}", user);
+            }
 
-            DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            if(!myHttpRequestMessage.getExtension().equals("")) {
+                String uriPath = myHttpRequestMessage.getUriPath();
+                byte[] body = Files.readAllBytes(new File(WebConfig.DEFAULT_TEMPLATES_PATH + uriPath).toPath());
+
+                DataOutputStream dos = new DataOutputStream(out);
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
         } catch (IOException e) {
             logger.error("읽을 수 없음: {}", e.getMessage());
         }
