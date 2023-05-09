@@ -19,18 +19,18 @@ public class MyHttpRequestMessage {
 	private static final Logger logger = LoggerFactory.getLogger(MyHttpRequestMessage.class);
 
 	private final String httpRequestMessage;
-	private final String path;
+	private final String uriPath;
 	private final String extension;
 	private final Map<String, String> queryParams;
 
 	public MyHttpRequestMessage(InputStream in) throws IOException {
 		this.httpRequestMessage = getHttpRequestMessageFrom(in);
 
-		String url = getUrlFromHttpRequestMessage(this.httpRequestMessage);
-		Map<String, String> urlFactors = parseUrl(url);
-		this.path = urlFactors.get("path");
-		this.extension = urlFactors.get("extension");
-		this.queryParams = getQueryParamsMapFrom(urlFactors.get("queryParams"));
+		String uriWithQueryString = getUriWithQueryStringFrom(this.httpRequestMessage);
+		Map<String, String> uriWithQueryStringFactors = parseUrl(uriWithQueryString);
+		this.uriPath = uriWithQueryStringFactors.get("uriPath");
+		this.extension = uriWithQueryStringFactors.get("extension");
+		this.queryParams = getQueryParamsMapFrom(uriWithQueryStringFactors.get("queryParams"));
 	}
 
 	private String getHttpRequestMessageFrom(InputStream in) throws IOException {
@@ -45,14 +45,14 @@ public class MyHttpRequestMessage {
 		return sb.toString();
 	}
 
-	private String getUrlFromHttpRequestMessage(String httpRequestMessage) {
+	private String getUriWithQueryStringFrom(String httpRequestMessage) {
 		try {
-			String url = httpRequestMessage.split(" ")[1];
-			if (url.equals("/")) {
-				url = WebConfig.DEFAULT_URL;
+			String uriWithQueryString = httpRequestMessage.split(" ")[1];
+			if (uriWithQueryString.equals("/")) {
+				uriWithQueryString = WebConfig.DEFAULT_URL;
 			}
 
-			return url;
+			return uriWithQueryString;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			logger.error("유효하지 않은 요청 메시지가 입력되었습니다.");
 			return "";
@@ -61,14 +61,13 @@ public class MyHttpRequestMessage {
 
 	private Map<String, String> parseUrl(String url) {
 		Map<String, String> map = new HashMap<>();
-		String[] urlFactors = url.split("\\?");
-		String urlPath = urlFactors[0];
+		String[] urlWithQueryStringFactors = url.split("\\?");
+		String uriPathFactor = urlWithQueryStringFactors[0];
 
-		map.put("path", urlPath);
-		map.put("queryParams", urlFactors[1] != null? urlFactors[1] : "");
-
-		int lastDotIndex = urlPath.lastIndexOf(".");
-		map.put("extension", urlPath.substring(lastDotIndex + 1));
+		map.put("uriPath", uriPathFactor);
+		int lastDotIndex = uriPathFactor.lastIndexOf(".");
+		map.put("extension", uriPathFactor.substring(lastDotIndex + 1));
+		map.put("queryParams", urlWithQueryStringFactors.length >= 2? urlWithQueryStringFactors[1] : "");
 
 		return map;
 	}
@@ -95,8 +94,8 @@ public class MyHttpRequestMessage {
 		return httpRequestMessage;
 	}
 
-	public String getPath() {
-		return path;
+	public String getUriPath() {
+		return uriPath;
 	}
 
 	public String getExtension() {
