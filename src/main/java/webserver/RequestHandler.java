@@ -1,20 +1,18 @@
 package webserver;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import config.WebConfig;
+import webserver.request.MyHttpRequestMessage;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -30,11 +28,11 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            String httpRequestMessage = getHttpRequestMessage(in);
-            debugHttpRequestMessage(httpRequestMessage);
+            MyHttpRequestMessage myHttpRequestMessage = new MyHttpRequestMessage(in);
+            logger.debug("<< HTTP Request Message >>\n{}", myHttpRequestMessage.getHttpRequestMessage());
 
-            String url = getRequestUrlFrom(httpRequestMessage);
-            byte[] body = Files.readAllBytes(new File(WebConfig.DEFAULT_PATH + url).toPath());
+            String path = myHttpRequestMessage.getPath();
+            byte[] body = Files.readAllBytes(new File(WebConfig.DEFAULT_PATH + path).toPath());
 
             DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, body.length);
@@ -64,28 +62,4 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private String getHttpRequestMessage(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-        StringBuilder sb = new StringBuilder();
-
-        String line;
-        while ((line = br.readLine()) != null && !line.isEmpty()) {
-            sb.append(line).append(System.lineSeparator());
-        }
-
-        return sb.toString();
-    }
-
-    private String getRequestUrlFrom(String httpRequestMessage) {
-        String url = httpRequestMessage.split(" ")[1];
-        if(url.equals("/")) {
-            url = WebConfig.DEFAULT_URL;
-        }
-
-        return url;
-    }
-
-    private void debugHttpRequestMessage(String httpRequestMessage) {
-        logger.debug("<< HTTP Request Message >>\n{}", httpRequestMessage);
-    }
 }
