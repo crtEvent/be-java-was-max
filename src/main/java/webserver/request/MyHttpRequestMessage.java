@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,16 +18,19 @@ import config.WebConfig;
 public class MyHttpRequestMessage {
 	private static final Logger logger = LoggerFactory.getLogger(MyHttpRequestMessage.class);
 
-	private final String path;
+	private final String httpRequestMessage;
+	private final String uriPath;
+	private final String extension;
 	private final Map<String, String> queryParams;
 
 	public MyHttpRequestMessage(InputStream in) throws IOException {
-		String httpRequestMessage = getHttpRequestMessageFrom(in);
+		this.httpRequestMessage = getHttpRequestMessageFrom(in);
 
-		String url = getUrlFromHttpRequestMessage(httpRequestMessage);
-		String[] urlFactors = parseUrl(url);
-		this.path = urlFactors[0];
-		this.queryParams = getQueryParamsFrom(urlFactors[1]);
+		String uriWithQueryString = getUriWithQueryStringFrom(this.httpRequestMessage);
+		Map<String, String> uriWithQueryStringFactors = parseUrl(uriWithQueryString);
+		this.uriPath = uriWithQueryStringFactors.get("uriPath");
+		this.extension = uriWithQueryStringFactors.get("extension");
+		this.queryParams = getQueryParamsMapFrom(uriWithQueryStringFactors.get("queryParams"));
 	}
 
 	private String getHttpRequestMessageFrom(InputStream in) throws IOException {
@@ -41,30 +45,34 @@ public class MyHttpRequestMessage {
 		return sb.toString();
 	}
 
-	private String getUrlFromHttpRequestMessage(String httpRequestMessage) {
+	private String getUriWithQueryStringFrom(String httpRequestMessage) {
 		try {
-			String url = httpRequestMessage.split(" ")[1];
-			if (url.equals("/")) {
-				url = WebConfig.DEFAULT_URL;
+			String uriWithQueryString = httpRequestMessage.split(" ")[1];
+			if (uriWithQueryString.equals("/")) {
+				uriWithQueryString = WebConfig.DEFAULT_URL;
 			}
 
-			return url;
+			return uriWithQueryString;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			logger.error("유효하지 않은 요청 메시지가 입력되었습니다.");
 			return "";
 		}
 	}
 
-	private String[] parseUrl(String url) {
-		String[] urlFactors = url.split("\\?");
+	private Map<String, String> parseUrl(String url) {
+		Map<String, String> map = new HashMap<>();
+		String[] urlWithQueryStringFactors = url.split("\\?");
+		String uriPathFactor = urlWithQueryStringFactors[0];
 
-		if (urlFactors.length == 2) {
-			return urlFactors;
-		}
-		return new String[] {urlFactors[0], ""};
+		map.put("uriPath", uriPathFactor);
+		int lastDotIndex = uriPathFactor.lastIndexOf(".");
+		map.put("extension", uriPathFactor.substring(lastDotIndex + 1));
+		map.put("queryParams", urlWithQueryStringFactors.length >= 2? urlWithQueryStringFactors[1] : "");
+
+		return map;
 	}
 
-	private Map<String, String> getQueryParamsFrom(String queryString) {
+	private Map<String, String> getQueryParamsMapFrom(String queryString) {
 		Map<String, String> map = new LinkedHashMap<>();
 
 		if (queryString != null && !queryString.isEmpty()) {
@@ -82,8 +90,16 @@ public class MyHttpRequestMessage {
 		return map;
 	}
 
-	public String getPath() {
-		return path;
+	public String getHttpRequestMessage() {
+		return httpRequestMessage;
+	}
+
+	public String getUriPath() {
+		return uriPath;
+	}
+
+	public String getExtension() {
+		return extension;
 	}
 
 	public Map<String, String> getQueryParams() {
