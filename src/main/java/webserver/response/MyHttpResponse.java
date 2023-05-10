@@ -36,7 +36,7 @@ public class MyHttpResponse {
 		this.stausCode = "200";
 		this.reasonPhrase = "OK";
 
-		this.body = makeBody(myHttpRequest.getRequestTarget());
+		this.body = makeBody(myHttpRequest.getRequestTarget(), myHttpRequest.getMimeType());
 
 		this.contentLength = body.length;
 
@@ -55,8 +55,15 @@ public class MyHttpResponse {
 		return headerMap;
 	}
 
-	private byte[] makeBody(String requestTarget) throws IOException {
-		return Files.readAllBytes(new File(WebConfig.DEFAULT_TEMPLATES_PATH + requestTarget).toPath());
+	private byte[] makeBody(String requestTarget, String mimeType) throws IOException {
+		String resourcePath;
+		if (mimeType.equals("text/html")) {
+			resourcePath = WebConfig.DEFAULT_TEMPLATES_PATH;
+		} else {
+			resourcePath = WebConfig.DEFAULT_STATIC_PATH;
+		}
+
+		return Files.readAllBytes(new File(resourcePath + requestTarget).toPath());
 	}
 
 	public String responseHeader() {
