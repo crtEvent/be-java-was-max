@@ -1,20 +1,18 @@
 package webserver;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import config.WebConfig;
 import model.MyModel;
 import model.User;
 import webserver.request.MyHttpRequest;
+import webserver.response.MyHttpResponse;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -39,33 +37,26 @@ public class RequestHandler implements Runnable {
                 logger.debug("User : {}", user);
             }
 
-            if(myHttpRequest.getMimeType().equals("text/html")) {
-                String requestTarget = myHttpRequest.getRequestTarget();
-                byte[] body = Files.readAllBytes(new File(WebConfig.DEFAULT_TEMPLATES_PATH + requestTarget).toPath());
-
-                DataOutputStream dos = new DataOutputStream(out);
-                response200Header(dos, body.length);
-                responseBody(dos, body);
-            }
+            DataOutputStream dos = new DataOutputStream(out);
+            MyHttpResponse myHttpResponse = new MyHttpResponse(myHttpRequest);
+            response200Header(dos, myHttpResponse);
+            responseBody(dos, myHttpResponse);
         } catch (IOException e) {
             logger.error("읽을 수 없음: {}", e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, MyHttpResponse myHttpResponse) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
+            dos.writeBytes(myHttpResponse.responseHeader());
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
+    private void responseBody(DataOutputStream dos, MyHttpResponse myHttpResponse) {
         try {
-            dos.write(body, 0, body.length);
+            dos.write(myHttpResponse.getBody(), 0, myHttpResponse.getContentLength());
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
