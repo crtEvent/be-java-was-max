@@ -78,7 +78,7 @@ public class MyHttpRequest {
 		if(splitStartLine.length == 3) {
 			startLineFactors.put(FIELD_NAME_HTTP_METHOD, splitStartLine[0]);
 			startLineFactors.put(FIELD_NAME_REQUEST_TARGET
-				, splitStartLine[1].equals("/") ? WebConfig.DEFAULT_URL : splitStartLine[1]);
+				, splitStartLine[1].equals("/") ? WebConfig.getWelcomePage() : splitStartLine[1]);
 			startLineFactors.put(FIELD_NAME_HTTP_VERSION, splitStartLine[2]);
 		} else {
 			startLineFactors.put(FIELD_NAME_HTTP_METHOD, "");

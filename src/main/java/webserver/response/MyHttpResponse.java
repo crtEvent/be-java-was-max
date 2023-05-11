@@ -58,9 +58,9 @@ public class MyHttpResponse {
 	private byte[] makeBody(String requestTarget, String mimeType) throws IOException {
 		String resourcePath;
 		if (mimeType.equals("text/html")) {
-			resourcePath = WebConfig.DEFAULT_TEMPLATES_PATH;
+			resourcePath = WebConfig.getTemplatesResourcePath();
 		} else {
-			resourcePath = WebConfig.DEFAULT_STATIC_PATH;
+			resourcePath = WebConfig.getStaticResourcePath();
 		}
 
 		return Files.readAllBytes(new File(resourcePath + requestTarget).toPath());

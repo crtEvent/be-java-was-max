@@ -12,9 +12,11 @@ public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
 
     public static void main(String[] args) throws Exception {
-        int port = 0;
+        WebConfig.readConfig();
+
+        int port;
         if (args == null || args.length == 0) {
-            port = WebConfig.DEFAULT_PORT;
+            port = WebConfig.getDefaultPort();
         } else {
             port = Integer.parseInt(args[0]);
         }
