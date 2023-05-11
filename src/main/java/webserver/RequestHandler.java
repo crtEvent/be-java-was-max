@@ -31,11 +31,7 @@ public class RequestHandler implements Runnable {
             MyHttpRequest myHttpRequest = new MyHttpRequest(in);
             logger.debug("<< HTTP Request Message >>\n{}", myHttpRequest);
 
-            if(myHttpRequest.getQueryParams().size() > 0) {
-                MyModel myModel = new MyModel(myHttpRequest.getQueryParams());
-                User user = new User(myModel.get("userId"), myModel.get("password"), myModel.get("name"), myModel.get("email"));
-                logger.debug("User : {}", user);
-            }
+            MyModel myModel = generateModel(myHttpRequest);
 
             DataOutputStream dos = new DataOutputStream(out);
             MyHttpResponse myHttpResponse = new MyHttpResponse(myHttpRequest);
@@ -44,6 +40,17 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error("읽을 수 없음: {}", e.getMessage());
         }
+    }
+
+    private MyModel generateModel(MyHttpRequest myHttpRequest) {
+        if(myHttpRequest.getQueryParams().size() > 0) {
+            MyModel myModel = new MyModel(myHttpRequest.getQueryParams());
+            User user = new User(myModel.get("userId"), myModel.get("password"), myModel.get("name"), myModel.get("email"));
+            logger.debug("User : {}", user);
+
+            return myModel;
+        }
+        return null;
     }
 
     private void response200Header(DataOutputStream dos, MyHttpResponse myHttpResponse) {
