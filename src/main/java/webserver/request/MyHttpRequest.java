@@ -20,9 +20,9 @@ import config.WebConfig;
 public class MyHttpRequest {
 	private static final Logger logger = LoggerFactory.getLogger(MyHttpRequest.class);
 
-	private static final String HTTP_METHOD = "method";
-	private static final String REQUEST_TARGET = "request-target";
-	private static final String HTTP_VERSION = "http-version";
+	private static final String FIELD_NAME_HTTP_METHOD = "method";
+	private static final String FIELD_NAME_REQUEST_TARGET = "request-target";
+	private static final String FIELD_NAME_HTTP_VERSION = "http-version";
 
 	private final List<String> httpRequestFactors;
 
@@ -43,9 +43,9 @@ public class MyHttpRequest {
 		this.httpRequestFactors = getHttpRequestFactorsFrom(in);
 
 		Map<String, String> startLineFactors = extractStartLine(this.httpRequestFactors);
-		this.method = startLineFactors.get(HTTP_METHOD);
-		this.requestTarget = startLineFactors.get(REQUEST_TARGET);
-		this.httpVersion = startLineFactors.get(HTTP_VERSION);
+		this.method = startLineFactors.get(FIELD_NAME_HTTP_METHOD);
+		this.requestTarget = startLineFactors.get(FIELD_NAME_REQUEST_TARGET);
+		this.httpVersion = startLineFactors.get(FIELD_NAME_HTTP_VERSION);
 
 		this.headers = extractHeader(this.httpRequestFactors);
 
@@ -76,14 +76,14 @@ public class MyHttpRequest {
 		}
 
 		if(splitStartLine.length == 3) {
-			startLineFactors.put(HTTP_METHOD, splitStartLine[0]);
-			startLineFactors.put(REQUEST_TARGET
+			startLineFactors.put(FIELD_NAME_HTTP_METHOD, splitStartLine[0]);
+			startLineFactors.put(FIELD_NAME_REQUEST_TARGET
 				, splitStartLine[1].equals("/") ? WebConfig.DEFAULT_URL : splitStartLine[1]);
-			startLineFactors.put(HTTP_VERSION, splitStartLine[2]);
+			startLineFactors.put(FIELD_NAME_HTTP_VERSION, splitStartLine[2]);
 		} else {
-			startLineFactors.put(HTTP_METHOD, "");
-			startLineFactors.put(REQUEST_TARGET, "");
-			startLineFactors.put(HTTP_VERSION, "");
+			startLineFactors.put(FIELD_NAME_HTTP_METHOD, "");
+			startLineFactors.put(FIELD_NAME_REQUEST_TARGET, "");
+			startLineFactors.put(FIELD_NAME_HTTP_VERSION, "");
 		}
 
 		return startLineFactors;
