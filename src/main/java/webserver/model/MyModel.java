@@ -1,4 +1,4 @@
-package model;
+package webserver.model;
 
 import java.util.Map;
 import java.util.Set;

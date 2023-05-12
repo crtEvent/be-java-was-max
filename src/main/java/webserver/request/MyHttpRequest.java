@@ -15,7 +15,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import config.WebConfig;
+import webserver.config.WebConfig;
 
 public class MyHttpRequest {
 	private static final Logger logger = LoggerFactory.getLogger(MyHttpRequest.class);

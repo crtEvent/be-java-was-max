@@ -9,8 +9,8 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import model.MyModel;
-import model.User;
+import webserver.model.MyModel;
+import application.model.User;
 import webserver.request.MyHttpRequest;
 import webserver.response.MyHttpResponse;
 

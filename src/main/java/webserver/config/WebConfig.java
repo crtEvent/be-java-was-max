@@ -1,4 +1,4 @@
-package config;
+package webserver.config;
 
 import java.io.FileInputStream;
 import java.io.IOException;
