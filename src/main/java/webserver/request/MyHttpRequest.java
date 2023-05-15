@@ -15,8 +15,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import webserver.config.WebConfig;
-
 public class MyHttpRequest {
 	private static final Logger logger = LoggerFactory.getLogger(MyHttpRequest.class);
 
@@ -77,8 +75,7 @@ public class MyHttpRequest {
 
 		if(splitStartLine.length == 3) {
 			startLineFactors.put(FIELD_NAME_HTTP_METHOD, splitStartLine[0]);
-			startLineFactors.put(FIELD_NAME_REQUEST_TARGET
-				, splitStartLine[1].equals("/") ? WebConfig.getWelcomePage() : splitStartLine[1]);
+			startLineFactors.put(FIELD_NAME_REQUEST_TARGET, splitStartLine[1]);
 			startLineFactors.put(FIELD_NAME_HTTP_VERSION, splitStartLine[2]);
 		} else {
 			startLineFactors.put(FIELD_NAME_HTTP_METHOD, "");
@@ -136,6 +133,10 @@ public class MyHttpRequest {
 
 	public String getRequestTarget() {
 		return requestTarget;
+	}
+
+	public String getRequestTargetWithoutQueryString() {
+		return requestTarget.split("\\?")[0];
 	}
 
 	public String getHttpVersion() {

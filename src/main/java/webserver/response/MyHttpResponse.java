@@ -31,12 +31,13 @@ public class MyHttpResponse {
 	// meta-data
 	private final int contentLength;
 
-	public MyHttpResponse(MyHttpRequest myHttpRequest) throws IOException {
+	public MyHttpResponse(MyHttpRequest myHttpRequest, String realTargetPath) throws IOException {
 		this.httpVersion = myHttpRequest.getHttpVersion();
 		this.stausCode = "200";
 		this.reasonPhrase = "OK";
 
-		this.body = makeBody(myHttpRequest.getRequestTarget(), myHttpRequest.getMimeType());
+		if(realTargetPath.isEmpty()) realTargetPath = myHttpRequest.getRequestTarget();
+		this.body = makeBody(realTargetPath, myHttpRequest.getMimeType());
 
 		this.contentLength = body.length;
 

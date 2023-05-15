@@ -8,7 +8,7 @@ import com.google.common.collect.Maps;
 import application.model.User;
 
 public class Database {
-    private static Map<String, User> users = Maps.newHashMap();
+    private static final Map<String, User> users = Maps.newHashMap();
 
     public static void addUser(User user) {
         users.put(user.getUserId(), user);

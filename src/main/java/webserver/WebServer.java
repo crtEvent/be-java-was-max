@@ -13,6 +13,7 @@ public class WebServer {
 
     public static void main(String[] args) throws Exception {
         WebConfig.readConfig();
+        ControllerHandler.initialize();
 
         int port;
         if (args == null || args.length == 0) {

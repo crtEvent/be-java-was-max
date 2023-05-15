@@ -45,4 +45,8 @@ public class WebConfig {
 	public static String getWelcomePage() {
 		return properties.getProperty("welcome_page");
 	}
+
+	public static String getControllerPackage() {
+		return properties.getProperty("controller_package");
+	}
 }

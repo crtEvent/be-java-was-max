@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 
 import org.slf4j.Logger;
@@ -29,15 +30,17 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             MyHttpRequest myHttpRequest = new MyHttpRequest(in);
-            logger.debug("<< HTTP Request Message >>\n{}", myHttpRequest);
+            logger.debug("<< HTTP Request Message >> {} {}", myHttpRequest.getMethod(), myHttpRequest.getRequestTarget());
 
-            MyModel myModel = generateModel(myHttpRequest);
+            // MyModel myModel = generateModel(myHttpRequest);
+
+            String realTargetPath = ControllerHandler.runRequestMappingMethod(myHttpRequest);
 
             DataOutputStream dos = new DataOutputStream(out);
-            MyHttpResponse myHttpResponse = new MyHttpResponse(myHttpRequest);
+            MyHttpResponse myHttpResponse = new MyHttpResponse(myHttpRequest, realTargetPath);
             response200Header(dos, myHttpResponse);
             responseBody(dos, myHttpResponse);
-        } catch (IOException e) {
+        } catch (IOException | InvocationTargetException | IllegalAccessException e) {
             logger.error("읽을 수 없음: {}", e.getMessage());
         }
     }
