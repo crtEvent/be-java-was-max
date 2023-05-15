@@ -17,8 +17,10 @@ public class WebConfig {
 	}
 
 	private static void debugProperties() {
-		logger.info("Read config from \"config.properties\"");
-		properties.forEach((key, value) -> logger.info("\t{}={}", key, value));
+		logger.info(" ╭ ⁀ ⁀ ╮");
+		logger.info("( '\uD83D\uDC45'  ) [Read config from \"config.properties\"]");
+		logger.info(" ╰ ‿  ‿ ╯");
+		properties.forEach((key, value) -> logger.info("▶ Read config : {}={}", key, value));
 	}
 
 	public static void readConfig() {

@@ -28,7 +28,9 @@ public class ControllerHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(ControllerHandler.class);
 
-	private static Map<ControllerMapperKey, Method> controllerMapper = new HashMap();
+	private static final Map<ControllerMapperKey, Method> controllerMapper = new HashMap<>();
+
+	private ControllerHandler() {}
 
 	public static String runRequestMappingMethod(MyHttpRequest myHttpRequest) throws
 		InvocationTargetException,
@@ -63,7 +65,20 @@ public class ControllerHandler {
 				controllerMapper.put(new ControllerMapperKey(requestMapping.value(), requestMapping.method(), instance), method);
 			}
 		}
+		debug();
 	}
+
+	private static void debug() {
+		logger.info("  　А А");
+		logger.info("　(*ﾟーﾟ) [Mapping Controller Methods]");
+		logger.info("～(_＿_)");
+		for(Map.Entry<ControllerMapperKey, Method> entry : controllerMapper.entrySet()) {
+			ControllerMapperKey key = entry.getKey();
+			Method method = entry.getValue();
+			logger.info("▶ Mapping : {}.{}()", key.getInstance().getClass().getName(), method.getName());
+		}
+	}
+
 
 	private static List<Class<?>> getAllClasses(String packageName) throws
 		URISyntaxException,
