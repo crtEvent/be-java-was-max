@@ -1,4 +1,4 @@
-package webserver.response;
+package webserver.http.response;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import webserver.config.WebConfig;
-import webserver.request.MyHttpRequest;
+import webserver.http.request.MyHttpRequest;
 
 public class MyHttpResponse {
 	private static final Logger logger = LoggerFactory.getLogger(MyHttpResponse.class);

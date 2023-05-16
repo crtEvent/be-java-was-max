@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
 import webserver.config.WebConfig;
-import webserver.request.MyHttpRequest;
+import webserver.http.request.MyHttpRequest;
 
 public class ControllerHandler {
 

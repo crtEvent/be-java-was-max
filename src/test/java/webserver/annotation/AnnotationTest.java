@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import webserver.ControllerHandler;
 import webserver.config.WebConfig;
-import webserver.request.MyHttpRequest;
+import webserver.http.request.MyHttpRequest;
 
 class AnnotationTest {
 

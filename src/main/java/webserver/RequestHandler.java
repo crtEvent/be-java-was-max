@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import webserver.model.MyModel;
 import application.model.User;
-import webserver.request.MyHttpRequest;
-import webserver.response.MyHttpResponse;
+import webserver.http.request.MyHttpRequest;
+import webserver.http.response.MyHttpResponse;
 
 public class RequestHandler implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);

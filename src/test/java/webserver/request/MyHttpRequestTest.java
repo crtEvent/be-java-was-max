@@ -11,6 +11,8 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import webserver.http.request.MyHttpRequest;
+
 class MyHttpRequestTest {
 
 	private final String validHttpRequestMessage = "GET /user/form.html HTTP/1.1\n"

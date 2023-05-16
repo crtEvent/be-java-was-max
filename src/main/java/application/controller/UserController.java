@@ -5,7 +5,7 @@ import application.model.User;
 import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
 import webserver.http.MyRequestMethod;
-import webserver.request.MyHttpRequest;
+import webserver.http.request.MyHttpRequest;
 
 @MyController
 public class UserController {
