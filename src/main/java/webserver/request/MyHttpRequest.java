@@ -32,13 +32,17 @@ public class MyHttpRequest {
 	// header
 	private final Map<String, String> headers;
 
+	// body
+	private final String body;
+
 	// meta-data
 	private final Map<String, String> queryParams;
 	private final String mimeType;
 
 
 	public MyHttpRequest(InputStream in) throws IOException {
-		this.httpRequestFactors = getHttpRequestFactorsFrom(in);
+		BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+		this.httpRequestFactors = getHttpRequestFactorsFrom(br);
 
 		Map<String, String> startLineFactors = extractStartLine(this.httpRequestFactors);
 		this.method = startLineFactors.get(FIELD_NAME_HTTP_METHOD);
@@ -47,12 +51,14 @@ public class MyHttpRequest {
 
 		this.headers = extractHeader(this.httpRequestFactors);
 
-		this.queryParams = extractQueryParams(this.requestTarget);
-		this.mimeType = headers.get("Accept").split(",")[0];
+		this.body = extractBody(br, this.headers, this.httpRequestFactors);
+
+		this.queryParams = (this.body.isEmpty())? extractQueryParams(this.requestTarget) : splitQueryString(this.body);
+		this.mimeType = extractMimeType();
+
 	}
 
-	private List<String> getHttpRequestFactorsFrom(InputStream in) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+	private List<String> getHttpRequestFactorsFrom(BufferedReader br) throws IOException {
 		List<String> requestFactors = new ArrayList<>();
 
 		String line;
@@ -87,13 +93,18 @@ public class MyHttpRequest {
 	}
 
 	private Map<String, String> extractQueryParams(String requestTarget) {
-		Map<String, String> paramMap = new LinkedHashMap<>();
 		String queryString;
 		try {
 			queryString = requestTarget.split("\\?")[1];
 		} catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
-			return paramMap;
+			return new LinkedHashMap<>();
 		}
+
+		return splitQueryString(queryString);
+	}
+
+	private Map<String, String> splitQueryString(String queryString) {
+		Map<String, String> paramMap = new LinkedHashMap<>();
 
 		if (queryString != null && !queryString.isEmpty()) {
 			String[] params = queryString.split("&");
@@ -113,7 +124,7 @@ public class MyHttpRequest {
 	private Map<String, String> extractHeader(List<String> httpRequestMessageFactors) {
 		Map<String, String> headerMap = new LinkedHashMap<>();
 		for(int i = 1; i < httpRequestMessageFactors.size(); i++) {
-			if(httpRequestMessageFactors.get(i).isEmpty()) {
+			if(httpRequestMessageFactors.get(i) == null || httpRequestMessageFactors.get(i).isEmpty()) {
 				break;
 			}
 			String[] pair = httpRequestMessageFactors.get(i).split(":\\s*");
@@ -121,6 +132,32 @@ public class MyHttpRequest {
 		}
 
 		return headerMap;
+	}
+
+	private String extractBody(BufferedReader br, Map<String, String> headers, List<String> httpRequestMessageFactors) throws
+		IOException {
+		if(headers.get("Content-Length") == null) {
+			return "";
+		}
+
+		String rawContentLength = headers.get("Content-Length");
+		int contentLength = Integer.parseInt(rawContentLength);
+
+		char[] bodyForRead = new char[contentLength];
+		br.read(bodyForRead);
+
+		String bodyForStrore = new String(bodyForRead);
+		httpRequestMessageFactors.add("");
+		httpRequestMessageFactors.add(bodyForStrore);
+
+		return bodyForStrore;
+	}
+
+	private String extractMimeType() {
+		if(headers.get("Accept") == null) {
+			return "";
+		}
+		return headers.get("Accept").split(",")[0];
 	}
 
 	public List<String> getHttpRequestFactors() {
@@ -159,6 +196,10 @@ public class MyHttpRequest {
 
 	public Map<String, String> getHeaders() {
 		return Collections.unmodifiableMap(headers);
+	}
+
+	public String getBody() {
+		return body;
 	}
 
 	@Override

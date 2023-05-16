@@ -49,6 +49,14 @@ class MyHttpRequestTest {
 		+ "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7\n"
 		+ "Cookie: rememberCheckbox=admin; JSESSIONID=F466F13D43C617D547721036DA103590";
 
+	private final String validPostHttpRequestMessage = "POST /user/create HTTP/1.1\n"
+		+ "Host: localhost:8080\n"
+		+ "Connection: keep-alive\n"
+		+ "Content-Length: 79\n"
+		+ "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7\n"
+		+ "\n"
+		+ "userId=user01&password=1234&name=ape&email=&hobby=reading&hobby=swimming&hobby=";
+
 	private final String InvalidHttpRequestMessage = "invalid http request message";
 	private final String emptyHttpRequestMessage = "";
 
@@ -121,6 +129,22 @@ class MyHttpRequestTest {
 
 		String mimdeType = myHttpRequest.getMimeType();
 		assertThat(mimdeType).isEqualTo("text/html");
+	}
+
+	@DisplayName("POST 요청일 때 body의 파라미터를 추출할 수 있다.")
+	@Test
+	void testBody() throws IOException {
+		in = new ByteArrayInputStream(validPostHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
+		myHttpRequest = new MyHttpRequest(in);
+
+		SoftAssertions softAssertions = new SoftAssertions();
+		softAssertions.assertThat(myHttpRequest.getQueryParam("userId")).isEqualTo("user01");
+		softAssertions.assertThat(myHttpRequest.getQueryParam("password")).isEqualTo("1234");
+		softAssertions.assertThat(myHttpRequest.getQueryParam("name")).isEqualTo("ape");
+		softAssertions.assertThat(myHttpRequest.getQueryParam("email")).isEqualTo("");
+		softAssertions.assertThat(myHttpRequest.getQueryParam("hobby")).isEqualTo("reading,swimming");
+
+		softAssertions.assertAll();
 	}
 
 }
