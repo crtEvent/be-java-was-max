@@ -17,6 +17,8 @@ import webserver.http.response.MyHttpResponse;
 
 public class RequestHandler implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+	private static final String REQUEST_EMOJI = "\uD83D\uDCE8";
+	private static final String RESPONSE_EMOJI = "\uD83D\uDCEC";
 
 	private final Socket connection;
 
@@ -47,14 +49,14 @@ public class RequestHandler implements Runnable {
 	}
 
 	private void debug(MyHttpResponse myHttpResponse) {
-		logger.debug("<< HTTP Response Message >> \n{}", myHttpResponse.responseHeader());
+		logger.debug("<< HTTP Response Message >> \n{}\n{}", RESPONSE_EMOJI, myHttpResponse.responseHeader());
 	}
 
 	private void debug(MyHttpRequest myHttpRequest) {
 		if (myHttpRequest.getMimeType().equals("text/html")) {
-			logger.debug("<< HTTP Request Message >> \n{}", myHttpRequest);
+			logger.debug("<< HTTP Request Message >> \n{}\n{}", REQUEST_EMOJI, myHttpRequest);
 		} else {
-			logger.debug("<< HTTP Request Message >> {} {}", myHttpRequest.getMethod(),
+			logger.debug("<< HTTP Request Message >> \n{}\n{} {}", REQUEST_EMOJI, myHttpRequest.getMethod(),
 				myHttpRequest.getRequestTarget());
 		}
 	}
