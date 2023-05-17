@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import webserver.config.WebConfig;
+import webserver.http.MyCookie;
 import webserver.http.request.MyHttpRequest;
 
 public class MyHttpResponse {
@@ -31,6 +32,7 @@ public class MyHttpResponse {
 	// meta-data
 	private final int contentLength;
 	private final String realTargetPath;
+	private final MyCookie cookie;
 
 	public MyHttpResponse(MyHttpRequest myHttpRequest, String realTargetPath) throws IOException {
 		this.httpVersion = myHttpRequest.getHttpVersion();
@@ -47,6 +49,7 @@ public class MyHttpResponse {
 
 		this.body = makeBody(this.realTargetPath, myHttpRequest.getMimeType());
 		this.contentLength = body.length;
+		this.cookie = myHttpRequest.getCookie();
 		this.headers = makeHeaders(myHttpRequest.getMimeType(), this.statusCode);
 	}
 
@@ -62,6 +65,9 @@ public class MyHttpResponse {
 			headerMap.put("Content-Length", String.valueOf(contentLength));
 		} else if(statusCode.equals("302")) {
 			headerMap.put("Location", realTargetPath);
+			if(cookie != null) {
+				headerMap.put("Set-Cookie", cookie.makeSetCookieResponseHeaderValue());
+			}
 		}
 
 		return headerMap;

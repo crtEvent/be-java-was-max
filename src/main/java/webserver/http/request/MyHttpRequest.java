@@ -15,6 +15,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import webserver.http.MyCookie;
+
 public class MyHttpRequest {
 	private static final Logger logger = LoggerFactory.getLogger(MyHttpRequest.class);
 
@@ -38,6 +40,7 @@ public class MyHttpRequest {
 	// meta-data
 	private final Map<String, String> queryParams;
 	private final String mimeType;
+	private MyCookie cookie;
 
 
 	public MyHttpRequest(InputStream in) throws IOException {
@@ -214,5 +217,13 @@ public class MyHttpRequest {
 
 	public String getMimeType() {
 		return mimeType;
+	}
+
+	public MyCookie getCookie() {
+		return cookie;
+	}
+
+	public void setCookie(MyCookie cookie) {
+		this.cookie = cookie;
 	}
 }
