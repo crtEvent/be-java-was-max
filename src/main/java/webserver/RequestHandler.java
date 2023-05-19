@@ -10,8 +10,6 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import webserver.model.MyModel;
-import application.model.User;
 import webserver.http.request.MyHttpRequest;
 import webserver.http.response.MyHttpResponse;
 
@@ -59,18 +57,6 @@ public class RequestHandler implements Runnable {
 			logger.debug("<< HTTP Request Message >> \n{}\n{} {}", REQUEST_EMOJI, myHttpRequest.getMethod(),
 				myHttpRequest.getRequestTarget());
 		}
-	}
-
-	private MyModel generateModel(MyHttpRequest myHttpRequest) {
-		if (myHttpRequest.getQueryParams().size() > 0) {
-			MyModel myModel = new MyModel(myHttpRequest.getQueryParams());
-			User user = new User(myModel.get("userId"), myModel.get("password"), myModel.get("name"),
-				myModel.get("email"));
-			logger.debug("User : {}", user);
-
-			return myModel;
-		}
-		return null;
 	}
 
 	private void responseHeader(DataOutputStream dos, MyHttpResponse myHttpResponse) {
