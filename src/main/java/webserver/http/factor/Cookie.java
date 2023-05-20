@@ -1,10 +1,10 @@
-package webserver.http;
+package webserver.http.factor;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class MyCookie {
+public class Cookie {
 	private final Map<String, String> cookies = new LinkedHashMap<>();
 
 	public void putCookieValue(String key, String value) {
