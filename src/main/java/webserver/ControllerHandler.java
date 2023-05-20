@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
 import webserver.config.WebConfig;
-import webserver.http.request.MyHttpRequest;
+import webserver.http.request.HttpRequestMessage;
 
 public class ControllerHandler {
 
@@ -32,16 +32,18 @@ public class ControllerHandler {
 
 	private ControllerHandler() {}
 
-	public static String runRequestMappingMethod(MyHttpRequest myHttpRequest) throws
-		InvocationTargetException,
-		IllegalAccessException {
-		for(Map.Entry<ControllerMapperKey, Method> entry : controllerMapper.entrySet()) {
-			ControllerMapperKey key = entry.getKey();
-			if(key.getUrl().equals(myHttpRequest.getRequestTargetWithoutQueryString())) {
-				Method method = entry.getValue();
-				logger.debug("<< Execute Request Mapping Method >> {}.{}()", key.getInstance().getClass().getName(), method.getName());
-				return (String) method.invoke(key.getInstance(), myHttpRequest);
+	public static String runRequestMappingMethod(HttpRequestMessage httpRequestMessage) {
+		try {
+			for(Map.Entry<ControllerMapperKey, Method> entry : controllerMapper.entrySet()) {
+				ControllerMapperKey key = entry.getKey();
+				if(key.getUrl().equals(httpRequestMessage.getRequestTargetWithoutQueryString())) {
+					Method method = entry.getValue();
+					logger.debug("<< Execute Request Mapping Method >> {}.{}()", key.getInstance().getClass().getName(), method.getName());
+					return (String) method.invoke(key.getInstance(), httpRequestMessage);
+				}
 			}
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			logger.error("해당 메서드에 접근할 수 없습니다. : {}", e.getMessage());
 		}
 
 		return "";

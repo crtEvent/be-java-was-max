@@ -7,38 +7,38 @@ import application.model.LoginRequest;
 import application.model.User;
 import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
-import webserver.http.MyCookie;
-import webserver.http.MyRequestMethod;
-import webserver.http.request.MyHttpRequest;
+import webserver.http.factor.Cookie;
+import webserver.http.factor.HttpMethod;
+import webserver.http.request.HttpRequestMessage;
 
 @MyController
 public class UserController {
 
-	@MyRequestMapping(value = "/user/create", method= MyRequestMethod.GET)
-	public String join(MyHttpRequest myHttpRequest) {
+	@MyRequestMapping(value = "/user/create", method= HttpMethod.GET)
+	public String join(HttpRequestMessage httpRequestMessage) {
 
-		User user = new User(myHttpRequest.getQueryParam("userId")
-			, myHttpRequest.getQueryParam("password")
-			, myHttpRequest.getQueryParam("name")
-			, myHttpRequest.getQueryParam("email"));
+		User user = new User(httpRequestMessage.getQueryParam("userId")
+			, httpRequestMessage.getQueryParam("password")
+			, httpRequestMessage.getQueryParam("name")
+			, httpRequestMessage.getQueryParam("email"));
 
 		Database.addUser(user);
 
 		return "/index.html";
 	}
 
-	@MyRequestMapping(value="/user/login", method = MyRequestMethod.POST)
-	public String login(MyHttpRequest myHttpRequest) {
-		LoginRequest loginRequest = new LoginRequest(myHttpRequest.getQueryParam("userId")
-			, myHttpRequest.getQueryParam("password"));
+	@MyRequestMapping(value="/user/login", method = HttpMethod.POST)
+	public String login(HttpRequestMessage httpRequestMessage) {
+		LoginRequest loginRequest = new LoginRequest(httpRequestMessage.getQueryParam("userId")
+			, httpRequestMessage.getQueryParam("password"));
 
 		User user = Database.findUserById(loginRequest.getUserId());
 		if(user != null && user.getPassword().equals(loginRequest.getPassword())) {
-			MyCookie myCookie = new MyCookie();
-			myCookie.putCookieValue("LOGIN_SID", UUID.randomUUID().toString());
-			myCookie.putCookieValue("userId", loginRequest.getUserId());
+			Cookie cookie = new Cookie();
+			cookie.putCookieValue("LOGIN_SID", UUID.randomUUID().toString());
+			cookie.putCookieValue("userId", loginRequest.getUserId());
 
-			myHttpRequest.setCookie(myCookie);
+			httpRequestMessage.setCookie(cookie);
 
 			return "/index.html";
 		}

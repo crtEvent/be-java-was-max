@@ -11,9 +11,10 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import webserver.http.request.MyHttpRequest;
+import webserver.http.request.HttpRequestMessage;
+import webserver.http.utill.HttpRequestMessageGenerator;
 
-class MyHttpRequestTest {
+class HttpRequestMessageTest {
 
 	private final String validHttpRequestMessage = "GET /user/form.html HTTP/1.1\n"
 		+ "Host: localhost:8080\n"
@@ -63,15 +64,15 @@ class MyHttpRequestTest {
 	private final String emptyHttpRequestMessage = "";
 
 	private InputStream in;
-	private MyHttpRequest myHttpRequest;
+	private HttpRequestMessage httpRequestMessage;
 
 	@DisplayName("리퀘스트 메시지에서 request-target(URI)만 추출할 수 있다.")
 	@Test
 	void testGetUriPath() throws IOException {
 		in = new ByteArrayInputStream(validHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
-		myHttpRequest = new MyHttpRequest(in);
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
-		String path = myHttpRequest.getRequestTarget();
+		String path = httpRequestMessage.getRequestTarget();
 		assertThat(path).isEqualTo("/user/form.html");
 	}
 
@@ -79,14 +80,14 @@ class MyHttpRequestTest {
 	@Test
 	void testGetQueryParams() throws IOException {
 		in = new ByteArrayInputStream(validHttpRequestMessageWithQueryString.getBytes(StandardCharsets.UTF_8));
-		myHttpRequest = new MyHttpRequest(in);
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
 		SoftAssertions softAssertions = new SoftAssertions();
-		softAssertions.assertThat(myHttpRequest.getQueryParam("userId")).isEqualTo("user01");
-		softAssertions.assertThat(myHttpRequest.getQueryParam("password")).isEqualTo("1234");
-		softAssertions.assertThat(myHttpRequest.getQueryParam("name")).isEqualTo("ape");
-		softAssertions.assertThat(myHttpRequest.getQueryParam("email")).isEqualTo("");
-		softAssertions.assertThat(myHttpRequest.getQueryParam("hobby")).isEqualTo("reading,swimming");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("userId")).isEqualTo("user01");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("password")).isEqualTo("1234");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("name")).isEqualTo("ape");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("email")).isEqualTo("");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("hobby")).isEqualTo("reading,swimming");
 
 		softAssertions.assertAll();
 	}
@@ -95,9 +96,9 @@ class MyHttpRequestTest {
 	@Test
 	void testGetEmptyQueryParams() throws IOException {
 		in = new ByteArrayInputStream(validHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
-		myHttpRequest = new MyHttpRequest(in);
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
-		String paramValue = myHttpRequest.getQueryParam("not exist");
+		String paramValue = httpRequestMessage.getQueryParam("not exist");
 		assertThat(paramValue).isEmpty();
 	}
 
@@ -105,19 +106,19 @@ class MyHttpRequestTest {
 	@Test
 	void testFail() throws IOException {
 		in = new ByteArrayInputStream(emptyHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
-		myHttpRequest = new MyHttpRequest(in);
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
 		SoftAssertions softAssertions = new SoftAssertions();
 
 		softAssertions.assertThatCode(() -> {
-			myHttpRequest = new MyHttpRequest(in);
+			httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 		}).doesNotThrowAnyException();
 
 		in = new ByteArrayInputStream(InvalidHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
-		myHttpRequest = new MyHttpRequest(in);
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
 		softAssertions.assertThatCode(() -> {
-			myHttpRequest = new MyHttpRequest(in);
+			httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 		}).doesNotThrowAnyException();
 
 		softAssertions.assertAll();
@@ -127,9 +128,9 @@ class MyHttpRequestTest {
 	@Test
 	void testHeader() throws IOException {
 		in = new ByteArrayInputStream(validHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
-		myHttpRequest = new MyHttpRequest(in);
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
-		String mimdeType = myHttpRequest.getMimeType();
+		String mimdeType = httpRequestMessage.getMimeType();
 		assertThat(mimdeType).isEqualTo("text/html");
 	}
 
@@ -137,14 +138,14 @@ class MyHttpRequestTest {
 	@Test
 	void testBody() throws IOException {
 		in = new ByteArrayInputStream(validPostHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
-		myHttpRequest = new MyHttpRequest(in);
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
 		SoftAssertions softAssertions = new SoftAssertions();
-		softAssertions.assertThat(myHttpRequest.getQueryParam("userId")).isEqualTo("user01");
-		softAssertions.assertThat(myHttpRequest.getQueryParam("password")).isEqualTo("1234");
-		softAssertions.assertThat(myHttpRequest.getQueryParam("name")).isEqualTo("ape");
-		softAssertions.assertThat(myHttpRequest.getQueryParam("email")).isEqualTo("");
-		softAssertions.assertThat(myHttpRequest.getQueryParam("hobby")).isEqualTo("reading,swimming");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("userId")).isEqualTo("user01");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("password")).isEqualTo("1234");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("name")).isEqualTo("ape");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("email")).isEqualTo("");
+		softAssertions.assertThat(httpRequestMessage.getQueryParam("hobby")).isEqualTo("reading,swimming");
 
 		softAssertions.assertAll();
 	}

@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import webserver.ControllerHandler;
 import webserver.config.WebConfig;
-import webserver.http.request.MyHttpRequest;
+import webserver.http.request.HttpRequestMessage;
+import webserver.http.utill.HttpRequestMessageGenerator;
 
 class AnnotationTest {
 
@@ -34,7 +35,7 @@ class AnnotationTest {
 		+ "Cookie: rememberCheckbox=admin; JSESSIONID=F466F13D43C617D547721036DA103590";
 
 	private InputStream in;
-	private MyHttpRequest myHttpRequest;
+	private HttpRequestMessage httpRequestMessage;
 
 	@DisplayName("/ 으로 접속하면 /index.html 로 이동한다.")
 	@Test
@@ -42,10 +43,10 @@ class AnnotationTest {
 		WebConfig.readConfig();
 
 		in = new ByteArrayInputStream(validHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
-		myHttpRequest = new MyHttpRequest(in);
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
 		ControllerHandler.initialize();
-		String returnValue = ControllerHandler.runRequestMappingMethod(myHttpRequest);
+		String returnValue = ControllerHandler.runRequestMappingMethod(httpRequestMessage);
 
 		Assertions.assertThat(returnValue).isEqualTo("/index.html");
 	}

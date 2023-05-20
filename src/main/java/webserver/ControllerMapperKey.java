@@ -2,14 +2,14 @@ package webserver;
 
 import java.util.Objects;
 
-import webserver.http.MyRequestMethod;
+import webserver.http.factor.HttpMethod;
 
 public class ControllerMapperKey {
 	private final String url;
-	private final MyRequestMethod requestMethod;
+	private final HttpMethod requestMethod;
 	private final Object instance;
 
-	public ControllerMapperKey(String url, MyRequestMethod requestMethod, Object instance) {
+	public ControllerMapperKey(String url, HttpMethod requestMethod, Object instance) {
 		this.url = url;
 		this.requestMethod = requestMethod;
 		this.instance = instance;
@@ -19,7 +19,7 @@ public class ControllerMapperKey {
 		return url;
 	}
 
-	public MyRequestMethod getRequestMethod() {
+	public HttpMethod getRequestMethod() {
 		return requestMethod;
 	}
 

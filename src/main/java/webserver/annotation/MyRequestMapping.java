@@ -5,11 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import webserver.http.MyRequestMethod;
+import webserver.http.factor.HttpMethod;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MyRequestMapping {
 	String value() default "";
-	MyRequestMethod method() default MyRequestMethod.GET;
+	HttpMethod method() default HttpMethod.GET;
 }

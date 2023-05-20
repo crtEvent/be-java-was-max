@@ -4,14 +4,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import webserver.http.request.MyHttpRequest;
-import webserver.http.response.MyHttpResponse;
+import webserver.http.request.HttpRequestMessage;
+import webserver.http.response.HttpResponseMessage;
+import webserver.http.utill.HttpRequestMessageGenerator;
+import webserver.http.utill.HttpResponseMessageGenerator;
 
 public class RequestHandler implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -29,47 +30,48 @@ public class RequestHandler implements Runnable {
 			connection.getPort());
 
 		try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-			MyHttpRequest myHttpRequest = new MyHttpRequest(in);
-			debug(myHttpRequest);
+			HttpRequestMessage httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
+			debug(httpRequestMessage);
 
-			String realTargetPath = ControllerHandler.runRequestMappingMethod(myHttpRequest);
+			HttpResponseMessage httpResponseMessage = HttpResponseMessageGenerator.generateHttpResponseMessage(httpRequestMessage);
+			debug(httpResponseMessage);
 
-			MyHttpResponse myHttpResponse = new MyHttpResponse(myHttpRequest, realTargetPath);
-			DataOutputStream dos = new DataOutputStream(out);
-			debug(myHttpResponse);
-
-			responseHeader(dos, myHttpResponse);
-			responseBody(dos, myHttpResponse);
-
-		} catch (IOException | InvocationTargetException | IllegalAccessException e) {
+			response(out, httpResponseMessage);
+		} catch (IOException e) {
 			logger.error("읽을 수 없음: {}", e.getMessage());
 		}
 	}
 
-	private void debug(MyHttpResponse myHttpResponse) {
-		logger.debug("<< HTTP Response Message >> \n{}\n{}", RESPONSE_EMOJI, myHttpResponse.responseHeader());
+	private void debug(HttpResponseMessage httpResponseMessage) {
+		logger.debug("<< HTTP Response Message >> \n{}\n{}", RESPONSE_EMOJI, httpResponseMessage.getStatusLineAndResponseHeaderMessage());
 	}
 
-	private void debug(MyHttpRequest myHttpRequest) {
-		if (myHttpRequest.getMimeType().equals("text/html")) {
-			logger.debug("<< HTTP Request Message >> \n{}\n{}", REQUEST_EMOJI, myHttpRequest);
+	private void debug(HttpRequestMessage httpRequestMessage) {
+		if (httpRequestMessage.getMimeType().equals("text/html")) {
+			logger.debug("<< HTTP Request Message >> \n{}\n{}", REQUEST_EMOJI, httpRequestMessage.getHttpRequestMessage());
 		} else {
-			logger.debug("<< HTTP Request Message >> \n{}\n{} {}", REQUEST_EMOJI, myHttpRequest.getMethod(),
-				myHttpRequest.getRequestTarget());
+			logger.debug("<< HTTP Request Message >> \n{}\n{} {}", REQUEST_EMOJI, httpRequestMessage.getMethod(),
+				httpRequestMessage.getRequestTarget());
 		}
 	}
 
-	private void responseHeader(DataOutputStream dos, MyHttpResponse myHttpResponse) {
+	private void response(OutputStream out, HttpResponseMessage httpResponseMessage) {
+		DataOutputStream dos = new DataOutputStream(out);
+		responseHeader(dos, httpResponseMessage);
+		responseBody(dos, httpResponseMessage);
+	}
+
+	private void responseHeader(DataOutputStream dos, HttpResponseMessage httpResponse) {
 		try {
-			dos.writeBytes(myHttpResponse.responseHeader());
+			dos.writeBytes(httpResponse.getStatusLineAndResponseHeaderMessage());
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
 	}
 
-	private void responseBody(DataOutputStream dos, MyHttpResponse myHttpResponse) {
+	private void responseBody(DataOutputStream dos, HttpResponseMessage httpResponse) {
 		try {
-			dos.write(myHttpResponse.getBody(), 0, myHttpResponse.getContentLength());
+			dos.write(httpResponse.getBody(), 0, httpResponse.getContentLength());
 			dos.flush();
 		} catch (IOException e) {
 			logger.error(e.getMessage());
