@@ -1,4 +1,4 @@
-package webserver;
+package webserver.http.utill;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -28,18 +28,19 @@ public class ControllerHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(ControllerHandler.class);
 
-	private static final Map<ControllerMapperKey, Method> controllerMapper = new HashMap<>();
+	private static final Map<ControllerMapperKey, ControllerHandlerValue> controllerMapper = new HashMap<>();
 
 	private ControllerHandler() {}
 
 	public static String runRequestMappingMethod(HttpRequestMessage httpRequestMessage) {
 		try {
-			for(Map.Entry<ControllerMapperKey, Method> entry : controllerMapper.entrySet()) {
-				ControllerMapperKey key = entry.getKey();
-				if(key.getUrl().equals(httpRequestMessage.getRequestTargetWithoutQueryString())) {
-					Method method = entry.getValue();
-					logger.debug("<< Execute Request Mapping Method >> {}.{}()", key.getInstance().getClass().getName(), method.getName());
-					return (String) method.invoke(key.getInstance(), httpRequestMessage);
+			for(Map.Entry<ControllerMapperKey, ControllerHandlerValue> entry : controllerMapper.entrySet()) {
+				if(entry.getKey().isMatch(httpRequestMessage.getRequestTargetWithoutQueryString(), httpRequestMessage.getMethod())) {
+					Method method = entry.getValue().getMethod();
+					logger.debug("<< Execute Request Mapping Method >> {}.{}()"
+						, entry.getValue().getInstance().getClass().getName()
+						, method.getName());
+					return (String) method.invoke(entry.getValue().getInstance(), httpRequestMessage);
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
@@ -64,7 +65,7 @@ public class ControllerHandler {
 
 			for (Method method : methods) {
 				MyRequestMapping requestMapping = method.getAnnotation(MyRequestMapping.class);
-				controllerMapper.put(new ControllerMapperKey(requestMapping.value(), requestMapping.method(), instance), method);
+				controllerMapper.put(new ControllerMapperKey(requestMapping.value(), requestMapping.method()), new ControllerHandlerValue(method, instance));
 			}
 		}
 		debug();
@@ -74,10 +75,8 @@ public class ControllerHandler {
 		logger.info("  　А А");
 		logger.info("　(*ﾟーﾟ) [Mapping Controller Methods]");
 		logger.info("～(_＿_)");
-		for(Map.Entry<ControllerMapperKey, Method> entry : controllerMapper.entrySet()) {
-			ControllerMapperKey key = entry.getKey();
-			Method method = entry.getValue();
-			logger.info("▶ Mapping : {}.{}()", key.getInstance().getClass().getName(), method.getName());
+		for(Map.Entry<ControllerMapperKey, ControllerHandlerValue> entry : controllerMapper.entrySet()) {
+			logger.info("▶ Mapping : {}.{}()", entry.getValue().getInstance().getClass().getName(), entry.getValue().getMethod().getName());
 		}
 	}
 
@@ -91,7 +90,7 @@ public class ControllerHandler {
 		String packageRelativePath = packageName.replace('.', '/');
 
 		URI packageUri = Objects.requireNonNull(
-			ControllerHandler.class.getResource("../" + packageRelativePath)).toURI();
+			ControllerHandler.class.getResource("/" + packageRelativePath)).toURI();
 
 		if (packageUri.getScheme().equals("file")) {
 			Path packageFullPath = Paths.get(packageUri);

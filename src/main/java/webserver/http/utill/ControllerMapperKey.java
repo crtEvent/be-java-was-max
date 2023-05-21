@@ -1,4 +1,4 @@
-package webserver;
+package webserver.http.utill;
 
 import java.util.Objects;
 
@@ -7,12 +7,10 @@ import webserver.http.factor.HttpMethod;
 public class ControllerMapperKey {
 	private final String url;
 	private final HttpMethod requestMethod;
-	private final Object instance;
 
-	public ControllerMapperKey(String url, HttpMethod requestMethod, Object instance) {
+	public ControllerMapperKey(String url, HttpMethod requestMethod) {
 		this.url = url;
 		this.requestMethod = requestMethod;
-		this.instance = instance;
 	}
 
 	public String getUrl() {
@@ -23,8 +21,8 @@ public class ControllerMapperKey {
 		return requestMethod;
 	}
 
-	public Object getInstance() {
-		return instance;
+	public boolean isMatch(String url, HttpMethod requestMethod) {
+		return Objects.equals(this.url, url) && this.requestMethod == requestMethod;
 	}
 
 	@Override
@@ -32,12 +30,12 @@ public class ControllerMapperKey {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		ControllerMapperKey that = (ControllerMapperKey) o;
-		return Objects.equals(url, that.url) && requestMethod == that.requestMethod && Objects.equals(instance, that.instance) ;
+		return Objects.equals(url, that.url) && requestMethod == that.requestMethod;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(url, requestMethod, instance);
+		return Objects.hash(url, requestMethod);
 	}
 
 	@Override
@@ -45,7 +43,6 @@ public class ControllerMapperKey {
 		return "ControllerMapperKey{" +
 			"url='" + url + '\'' +
 			", requestMethod=" + requestMethod +
-			", instance=" + instance +
 			'}';
 	}
 }
