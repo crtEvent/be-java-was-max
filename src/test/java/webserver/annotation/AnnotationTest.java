@@ -8,7 +8,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import webserver.ControllerHandler;
+import webserver.http.utill.ControllerHandler;
 import webserver.config.WebConfig;
 import webserver.http.request.HttpRequestMessage;
 import webserver.http.utill.HttpRequestMessageGenerator;

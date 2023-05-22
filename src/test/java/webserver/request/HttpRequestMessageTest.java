@@ -11,7 +11,9 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import webserver.config.WebConfig;
 import webserver.http.request.HttpRequestMessage;
+import webserver.http.utill.ControllerHandler;
 import webserver.http.utill.HttpRequestMessageGenerator;
 
 class HttpRequestMessageTest {
@@ -60,6 +62,28 @@ class HttpRequestMessageTest {
 		+ "\n"
 		+ "userId=user01&password=1234&name=ape&email=&hobby=reading&hobby=swimming&hobby=";
 
+	private final String validLoginHttpRequestMessage = "POST /user/login HTTP/1.1\n"
+		+ "Host: localhost\n"
+		+ "Connection: keep-alive\n"
+		+ "Content-Length: 26\n"
+		+ "Cache-Control: max-age=0\n"
+		+ "sec-ch-ua: \"Google Chrome\";v=\"113\", \"Chromium\";v=\"113\", \"Not-A.Brand\";v=\"24\"\n"
+		+ "sec-ch-ua-mobile: ?0\n"
+		+ "sec-ch-ua-platform: \"Windows\"\n"
+		+ "Upgrade-Insecure-Requests: 1\n"
+		+ "Origin: http\n"
+		+ "Content-Type: application/x-www-form-urlencoded\n"
+		+ "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36\n"
+		+ "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7\n"
+		+ "Sec-Fetch-Site: same-origin\n"
+		+ "Sec-Fetch-Mode: navigate\n"
+		+ "Sec-Fetch-User: ?1\n"
+		+ "Sec-Fetch-Dest: document\n"
+		+ "Referer: http\n"
+		+ "Accept-Encoding: gzip, deflate, br\n"
+		+ "Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7\n"
+		+ "\n"
+		+ "userId=admin&password=1234";
 	private final String InvalidHttpRequestMessage = "invalid http request message";
 	private final String emptyHttpRequestMessage = "";
 
@@ -149,5 +173,19 @@ class HttpRequestMessageTest {
 
 		softAssertions.assertAll();
 	}
+
+	@DisplayName("로그인 하면 쿠키가 생성된다.")
+	@Test
+	void testCookie() throws Exception {
+		in = new ByteArrayInputStream(validLoginHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
+		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
+
+		WebConfig.readConfig();
+		ControllerHandler.initialize();
+		String returnValue = ControllerHandler.runRequestMappingMethod(httpRequestMessage);
+
+		assertThat(httpRequestMessage.getCookie()).isNotNull();
+	}
+
 
 }
