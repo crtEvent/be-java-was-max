@@ -38,7 +38,7 @@ public class HttpResponseMessageGenerator {
 	}
 
 	private static String selectRealTargetPath(HttpRequestMessage httpRequestMessage) {
-		String realTargetPath = ControllerHandler.runRequestMappingMethod(httpRequestMessage);
+		String realTargetPath = ControllerMapper.runRequestMappingMethod(httpRequestMessage);
 
 		if(realTargetPath.isEmpty()) {
 			return httpRequestMessage.getRequestTarget();

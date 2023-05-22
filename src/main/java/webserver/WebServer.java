@@ -7,14 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import webserver.config.WebConfig;
-import webserver.http.utill.ControllerHandler;
+import webserver.http.utill.ControllerMapper;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
 
     public static void main(String[] args) throws Exception {
         WebConfig.readConfig();
-        ControllerHandler.initialize();
+        ControllerMapper.initialize();
 
         int port;
         if (args == null || args.length == 0) {

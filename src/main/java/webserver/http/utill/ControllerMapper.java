@@ -24,17 +24,17 @@ import webserver.annotation.MyRequestMapping;
 import webserver.config.WebConfig;
 import webserver.http.request.HttpRequestMessage;
 
-public class ControllerHandler {
+public class ControllerMapper {
 
-	private static final Logger logger = LoggerFactory.getLogger(ControllerHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(ControllerMapper.class);
 
-	private static final Map<ControllerMapperKey, ControllerHandlerValue> controllerMapper = new HashMap<>();
+	private static final Map<ControllerMapperKey, ControllerMapperValue> controllerMap = new HashMap<>();
 
-	private ControllerHandler() {}
+	private ControllerMapper() {}
 
 	public static String runRequestMappingMethod(HttpRequestMessage httpRequestMessage) {
 		try {
-			for(Map.Entry<ControllerMapperKey, ControllerHandlerValue> entry : controllerMapper.entrySet()) {
+			for(Map.Entry<ControllerMapperKey, ControllerMapperValue> entry : controllerMap.entrySet()) {
 				if(entry.getKey().isMatch(httpRequestMessage.getRequestTargetWithoutQueryString(), httpRequestMessage.getMethod())) {
 					Method method = entry.getValue().getMethod();
 					logger.debug("<< Execute Request Mapping Method >> {}.{}()"
@@ -65,7 +65,7 @@ public class ControllerHandler {
 
 			for (Method method : methods) {
 				MyRequestMapping requestMapping = method.getAnnotation(MyRequestMapping.class);
-				controllerMapper.put(new ControllerMapperKey(requestMapping.value(), requestMapping.method()), new ControllerHandlerValue(method, instance));
+				controllerMap.put(new ControllerMapperKey(requestMapping.value(), requestMapping.method()), new ControllerMapperValue(method, instance));
 			}
 		}
 		debug();
@@ -75,7 +75,7 @@ public class ControllerHandler {
 		logger.info("  　А А");
 		logger.info("　(*ﾟーﾟ) [Mapping Controller Methods]");
 		logger.info("～(_＿_)");
-		for(Map.Entry<ControllerMapperKey, ControllerHandlerValue> entry : controllerMapper.entrySet()) {
+		for(Map.Entry<ControllerMapperKey, ControllerMapperValue> entry : controllerMap.entrySet()) {
 			logger.info("▶ Mapping : {}.{}()", entry.getValue().getInstance().getClass().getName(), entry.getValue().getMethod().getName());
 		}
 	}
@@ -90,7 +90,7 @@ public class ControllerHandler {
 		String packageRelativePath = packageName.replace('.', '/');
 
 		URI packageUri = Objects.requireNonNull(
-			ControllerHandler.class.getResource("/" + packageRelativePath)).toURI();
+			ControllerMapper.class.getResource("/" + packageRelativePath)).toURI();
 
 		if (packageUri.getScheme().equals("file")) {
 			Path packageFullPath = Paths.get(packageUri);

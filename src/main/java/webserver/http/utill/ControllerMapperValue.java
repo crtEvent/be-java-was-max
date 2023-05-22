@@ -2,11 +2,11 @@ package webserver.http.utill;
 
 import java.lang.reflect.Method;
 
-public class ControllerHandlerValue {
+public class ControllerMapperValue {
 	private final Method method;
 	private final Object instance;
 
-	public ControllerHandlerValue(Method method, Object instance) {
+	public ControllerMapperValue(Method method, Object instance) {
 		this.method = method;
 		this.instance = instance;
 	}
