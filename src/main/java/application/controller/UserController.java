@@ -7,7 +7,7 @@ import application.model.LoginRequest;
 import application.model.User;
 import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
-import webserver.http.factor.Cookie;
+import webserver.http.factor.cookie.Cookie;
 import webserver.http.factor.HttpMethod;
 import webserver.http.request.HttpRequestMessage;
 
@@ -34,9 +34,8 @@ public class UserController {
 
 		User user = Database.findUserById(loginRequest.getUserId());
 		if(user != null && user.getPassword().equals(loginRequest.getPassword())) {
-			Cookie cookie = new Cookie();
-			cookie.putCookieValue("LOGIN_SID", UUID.randomUUID().toString());
-			cookie.putCookieValue("userId", loginRequest.getUserId());
+			Cookie cookie = new Cookie("LOGIN_SID", UUID.randomUUID().toString());
+			cookie.setMaxAge(60 * 60 * 24);
 
 			httpRequestMessage.setCookie(cookie);
 

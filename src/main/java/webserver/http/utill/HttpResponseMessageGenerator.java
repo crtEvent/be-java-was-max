@@ -86,7 +86,7 @@ public class HttpResponseMessageGenerator {
 		} else if(statusLine.isStatusCodeTypeMatch(StatusCodeType.FOUND_302)) {
 			header.put(ResponseHeaderType.LOCATION.getFieldName(), realTargetPath);
 			if(httpRequestMessage.getCookie() != null) {
-				header.put(ResponseHeaderType.SET_COOKIE.getFieldName(), httpRequestMessage.getCookie().makeSetCookieResponseHeaderValue());
+				header.put(ResponseHeaderType.SET_COOKIE.getFieldName(), httpRequestMessage.getCookie().getSetCookieResponseHeaderValue());
 			}
 		}
 

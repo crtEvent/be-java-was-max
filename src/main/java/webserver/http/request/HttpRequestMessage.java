@@ -1,6 +1,6 @@
 package webserver.http.request;
 
-import webserver.http.factor.Cookie;
+import webserver.http.factor.cookie.Cookie;
 import webserver.http.factor.HttpMethod;
 import webserver.http.factor.QueryString;
 import webserver.http.factor.body.RequestBody;
