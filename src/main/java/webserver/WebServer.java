@@ -6,8 +6,6 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import application.db.Database;
-import application.model.User;
 import webserver.config.WebConfig;
 import webserver.http.utill.ControllerHandler;
 
@@ -17,7 +15,6 @@ public class WebServer {
     public static void main(String[] args) throws Exception {
         WebConfig.readConfig();
         ControllerHandler.initialize();
-        Database.addUser(new User("admin", "1234", "관리자", "admin@cdsqd.com"));
 
         int port;
         if (args == null || args.length == 0) {
