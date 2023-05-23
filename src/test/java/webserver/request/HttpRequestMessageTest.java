@@ -13,8 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import webserver.config.WebConfig;
 import webserver.http.request.HttpRequestMessage;
-import webserver.http.utill.ControllerHandler;
+import webserver.http.utill.ControllerMapper;
 import webserver.http.utill.HttpRequestMessageGenerator;
+import webserver.model.ModelAndView;
 
 class HttpRequestMessageTest {
 
@@ -181,10 +182,10 @@ class HttpRequestMessageTest {
 		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
 		WebConfig.readConfig();
-		ControllerHandler.initialize();
-		String returnValue = ControllerHandler.runRequestMappingMethod(httpRequestMessage);
+		ControllerMapper.initialize();
+		ModelAndView modelAndView = ControllerMapper.runRequestMappingMethod(httpRequestMessage);
 
-		assertThat(httpRequestMessage.getCookie()).isNotNull();
+		assertThat(httpRequestMessage.getNewCookie()).isNotNull();
 	}
 
 

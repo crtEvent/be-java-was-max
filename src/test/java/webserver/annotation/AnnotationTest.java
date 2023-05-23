@@ -8,10 +8,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import webserver.http.utill.ControllerHandler;
+import webserver.http.utill.ControllerMapper;
 import webserver.config.WebConfig;
 import webserver.http.request.HttpRequestMessage;
 import webserver.http.utill.HttpRequestMessageGenerator;
+import webserver.model.ModelAndView;
 
 class AnnotationTest {
 
@@ -45,9 +46,10 @@ class AnnotationTest {
 		in = new ByteArrayInputStream(validHttpRequestMessage.getBytes(StandardCharsets.UTF_8));
 		httpRequestMessage = HttpRequestMessageGenerator.generateHttpRequestMessage(in);
 
-		ControllerHandler.initialize();
-		String returnValue = ControllerHandler.runRequestMappingMethod(httpRequestMessage);
+		ControllerMapper.initialize();
+		ModelAndView modelAndView = ControllerMapper.runRequestMappingMethod(httpRequestMessage);
 
-		Assertions.assertThat(returnValue).isEqualTo("/index.html");
+		assert modelAndView != null;
+		Assertions.assertThat(modelAndView.getView()).isEqualTo("/index.html");
 	}
 }
