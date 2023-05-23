@@ -23,6 +23,7 @@ import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
 import webserver.config.WebConfig;
 import webserver.http.request.HttpRequestMessage;
+import webserver.model.ModelAndView;
 
 public class ControllerMapper {
 
@@ -32,7 +33,7 @@ public class ControllerMapper {
 
 	private ControllerMapper() {}
 
-	public static String runRequestMappingMethod(HttpRequestMessage httpRequestMessage) {
+	public static ModelAndView runRequestMappingMethod(HttpRequestMessage httpRequestMessage) {
 		try {
 			for(Map.Entry<ControllerMapperKey, ControllerMapperValue> entry : controllerMap.entrySet()) {
 				if(entry.getKey().isMatch(httpRequestMessage.getRequestTargetWithoutQueryString(), httpRequestMessage.getMethod())) {
@@ -40,14 +41,14 @@ public class ControllerMapper {
 					logger.debug("<< Execute Request Mapping Method >> {}.{}()"
 						, entry.getValue().getInstance().getClass().getName()
 						, method.getName());
-					return (String) method.invoke(entry.getValue().getInstance(), httpRequestMessage);
+					return (ModelAndView) method.invoke(entry.getValue().getInstance(), httpRequestMessage);
 				}
 			}
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			logger.error("해당 메서드에 접근할 수 없습니다. : {}", e.getMessage());
 		}
 
-		return "";
+		return null;
 	}
 
 	public static void initialize() throws NoSuchMethodException, IllegalAccessException,

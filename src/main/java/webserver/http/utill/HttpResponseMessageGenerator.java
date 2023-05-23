@@ -18,6 +18,7 @@ import webserver.http.factor.header.type.ResponseHeaderType;
 import webserver.http.factor.start_line.StatusLine;
 import webserver.http.request.HttpRequestMessage;
 import webserver.http.response.HttpResponseMessage;
+import webserver.model.ModelAndView;
 
 public class HttpResponseMessageGenerator {
 
@@ -26,24 +27,24 @@ public class HttpResponseMessageGenerator {
 	private HttpResponseMessageGenerator() {}
 
 	public static HttpResponseMessage generateHttpResponseMessage(HttpRequestMessage httpRequestMessage) {
-		String realTargetPath = selectRealTargetPath(httpRequestMessage);
+		ModelAndView modelAndView = selectRealTargetPath(httpRequestMessage);
 
 		StatusLine statusLine = generateStatusLine(httpRequestMessage);
 
-		ResponseBody body = generateResponseBody(httpRequestMessage, realTargetPath);
+		ResponseBody body = generateResponseBody(httpRequestMessage, modelAndView);
 
-		ResponseHeader header = generateResponseHeader(httpRequestMessage, statusLine, body, realTargetPath);
+		ResponseHeader header = generateResponseHeader(httpRequestMessage, statusLine, body, modelAndView);
 
 		return new HttpResponseMessage(statusLine, header, body);
 	}
 
-	private static String selectRealTargetPath(HttpRequestMessage httpRequestMessage) {
-		String realTargetPath = ControllerMapper.runRequestMappingMethod(httpRequestMessage);
+	private static ModelAndView selectRealTargetPath(HttpRequestMessage httpRequestMessage) {
+		ModelAndView modelAndView = ControllerMapper.runRequestMappingMethod(httpRequestMessage);
 
-		if(realTargetPath.isEmpty()) {
-			return httpRequestMessage.getRequestTarget();
+		if(modelAndView == null) {
+			modelAndView = new ModelAndView(httpRequestMessage.getRequestTarget());
 		}
-		return realTargetPath;
+		return modelAndView;
 	}
 
 	private static StatusLine generateStatusLine(HttpRequestMessage httpRequestMessage) {
@@ -59,23 +60,27 @@ public class HttpResponseMessageGenerator {
 		return new StatusLine(httpRequestMessage.getHttpVersion(), statusCodeType);
 	}
 
-	private static ResponseBody generateResponseBody(HttpRequestMessage httpRequestMessage, String realRequestTarget) {
+	private static ResponseBody generateResponseBody(HttpRequestMessage httpRequestMessage, ModelAndView modelAndView) {
 		String resourcePath;
-		if (MimeType.TEXT_HTML.getTypePhrase().equals(httpRequestMessage.getMimeType())) {
+		if (isTextHtmlMimeType(httpRequestMessage.getMimeType())) {
 			resourcePath = WebConfig.getTemplatesResourcePath();
+			return new ResponseBody(TemplateEngineParser.parseHtmlDynamically(new File(resourcePath + modelAndView.getView()).toPath(), modelAndView));
 		} else {
 			resourcePath = WebConfig.getStaticResourcePath();
-		}
-
-		try {
-			return new ResponseBody(Files.readAllBytes(new File(resourcePath + realRequestTarget).toPath()));
-		} catch (IOException e) {
-			return new ResponseBody(new byte[]{});
+			try {
+				return new ResponseBody(Files.readAllBytes(new File(resourcePath + modelAndView.getView()).toPath()));
+			} catch (IOException e) {
+				return new ResponseBody(new byte[]{});
+			}
 		}
 	}
 
+	private static boolean isTextHtmlMimeType(String mimeType) {
+		return MimeType.TEXT_HTML.getTypePhrase().equals(mimeType);
+	}
 
-	private static ResponseHeader generateResponseHeader(HttpRequestMessage httpRequestMessage, StatusLine statusLine, ResponseBody body, String realTargetPath) {
+
+	private static ResponseHeader generateResponseHeader(HttpRequestMessage httpRequestMessage, StatusLine statusLine, ResponseBody body, ModelAndView modelAndView) {
 		String mimeType = httpRequestMessage.getMimeType();
 
 		ResponseHeader header = new ResponseHeader();
@@ -84,9 +89,9 @@ public class HttpResponseMessageGenerator {
 			header.put(EntityHeaderType.CONTENT_TYPE.getFieldName(), mimeType);
 			header.put(EntityHeaderType.CONTENT_LENGTH.getFieldName(), String.valueOf(body.getContentLength()));
 		} else if(statusLine.isStatusCodeTypeMatch(StatusCodeType.FOUND_302)) {
-			header.put(ResponseHeaderType.LOCATION.getFieldName(), realTargetPath);
-			if(httpRequestMessage.getCookie() != null) {
-				header.put(ResponseHeaderType.SET_COOKIE.getFieldName(), httpRequestMessage.getCookie().getSetCookieResponseHeaderValue());
+			header.put(ResponseHeaderType.LOCATION.getFieldName(), modelAndView.getView());
+			if(httpRequestMessage.getNewCookie() != null) {
+				header.put(ResponseHeaderType.SET_COOKIE.getFieldName(), httpRequestMessage.getNewCookie().getSetCookieResponseHeaderValue());
 			}
 		}
 

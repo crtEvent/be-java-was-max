@@ -1,9 +1,10 @@
 package webserver.http.request;
 
-import webserver.http.factor.cookie.Cookie;
 import webserver.http.factor.HttpMethod;
 import webserver.http.factor.QueryString;
 import webserver.http.factor.body.RequestBody;
+import webserver.http.factor.cookie.CookieMap;
+import webserver.http.factor.cookie.NewCookie;
 import webserver.http.factor.header.RequestHeader;
 import webserver.http.factor.header.type.RequestHeaderType;
 import webserver.http.factor.start_line.RequestLine;
@@ -13,7 +14,7 @@ public class HttpRequestMessage {
 	private final RequestHeader header;
 	private final RequestBody body;
 	private final QueryString queryString;
-	private Cookie cookie;
+	private NewCookie newCookie;
 
 	public HttpRequestMessage(RequestLine requestLine, RequestHeader header, RequestBody body, QueryString queryString) {
 		this.requestLine = requestLine;
@@ -69,12 +70,16 @@ public class HttpRequestMessage {
 		return value.split(",")[0];
 	}
 
-	public Cookie getCookie() {
-		return cookie;
+	public CookieMap getCookies() {
+		return new CookieMap(header.getFieldValue(RequestHeaderType.COOKIE));
 	}
 
-	public void setCookie(Cookie cookie) {
-		this.cookie = cookie;
+	public NewCookie getNewCookie() {
+		return newCookie;
+	}
+
+	public void setNewCookie(NewCookie newCookie) {
+		this.newCookie = newCookie;
 	}
 
 }

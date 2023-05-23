@@ -6,6 +6,7 @@ public enum RequestHeaderType {
 	ACCEPT_CHARSET("Accept-Charset"),
 	ACCEPT_ENCODING("Accept-Encoding"),
 	ACCEPT_LANGUAGE("Accept-Language"),
+	COOKIE("Cookie"),
 	HOST("Host");
 
 	private final String fieldName;
