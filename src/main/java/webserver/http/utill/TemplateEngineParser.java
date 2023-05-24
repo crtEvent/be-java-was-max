@@ -5,10 +5,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import webserver.model.ModelAndView;
 
 public class TemplateEngineParser {
+
+	private static final String PRINT_STRING_REG_PATTERN = "\\{\\{fn-printString: (.*?)\\}\\}";
 
 	private TemplateEngineParser() {
 
@@ -19,39 +23,33 @@ public class TemplateEngineParser {
 			StringBuilder sb = new StringBuilder();
 
 			String line;
-
 			while ((line = br.readLine()) != null) {
-				// HTML 파일의 한 줄씩 처리하는 로직
-				//System.out.println(parseHtmlLine(line, modelAndView));
-				sb.append(parseHtmlLine(line, modelAndView));
-				System.out.println(parseHtmlLine(line, modelAndView));
+				sb.append(line).append(System.lineSeparator());
 			}
 
-			return sb.toString().getBytes(StandardCharsets.UTF_8);
+			return replaceTemplateTag(sb.toString(), modelAndView).getBytes(StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return new byte[]{};
 		}
 	}
 
-	private static String parseHtmlLine(String line, ModelAndView modelAndView) {
-		int startPosition = line.indexOf("{{");
-		int endPosition = line.indexOf("}}");
+	private static String replaceTemplateTag(String html, ModelAndView modelAndView) {
+		return replacePrintString(html, modelAndView);
+	}
 
-		while (startPosition >= 0 && endPosition >= 0) {
-			String substringForMatch = line.substring(startPosition + 2, endPosition);
-			String substringToReplace = line.substring(startPosition, endPosition + 2);
+	private static String replacePrintString(String html, ModelAndView modelAndView) {
 
-			if(modelAndView.isContainAttribute(substringForMatch)) {
-				line = line.replace(substringToReplace, (String) modelAndView.getAttribute(substringForMatch));
-			} else {
-				line = line.replace(substringToReplace,"null");
+		Pattern regex = Pattern.compile(PRINT_STRING_REG_PATTERN);
+		Matcher matcher = regex.matcher(html);
+
+		while (matcher.find()) {
+			if(modelAndView.isContainAttribute(matcher.group(1))) {
+				html = html.replaceAll("\\{\\{fn-printString: " + matcher.group(1) + "\\}\\}", (String) modelAndView.getAttribute(matcher.group(1)));
 			}
-
-			startPosition = line.indexOf("{{");
-			endPosition = line.indexOf("}}");
 		}
 
-		return line;
+		return html;
 	}
+
 }
