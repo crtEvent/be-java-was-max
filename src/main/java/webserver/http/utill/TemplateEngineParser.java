@@ -12,7 +12,9 @@ import webserver.model.ModelAndView;
 
 public class TemplateEngineParser {
 
-	private static final String PRINT_STRING_REG_PATTERN = "\\{\\{fn-printString: (.*?)\\}\\}";
+	private static final String PRINT_STRING_REG_PATTERN = "\\{\\{fn-printString:\\s?(.*?)\\}\\}";
+	private static final String IF_NOT_NULL_REG_PATTERN = "\\{\\{fn-ifNotNull:\\s?(.*?)\\}\\}(.*?)\\{\\{/fn-ifNotNull\\}\\}";
+	private static final String IF_NULL_REG_PATTERN = "\\{\\{fn-ifNull:\\s?(.*?)\\}\\}(.*?)\\{\\{/fn-ifNull\\}\\}";
 
 	private TemplateEngineParser() {
 
@@ -30,26 +32,63 @@ public class TemplateEngineParser {
 			return replaceTemplateTag(sb.toString(), modelAndView).getBytes(StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return new byte[]{};
+			return new byte[] {};
 		}
 	}
 
 	private static String replaceTemplateTag(String html, ModelAndView modelAndView) {
-		return replacePrintString(html, modelAndView);
+		html = replaceIfNotNullTag(html, modelAndView);
+		html = replaceIfNullTag(html, modelAndView);
+		html = replacePrintStringTag(html, modelAndView);
+		return html;
 	}
 
-	private static String replacePrintString(String html, ModelAndView modelAndView) {
-
+	private static String replacePrintStringTag(String html, ModelAndView modelAndView) {
 		Pattern regex = Pattern.compile(PRINT_STRING_REG_PATTERN);
 		Matcher matcher = regex.matcher(html);
 
 		while (matcher.find()) {
-			if(modelAndView.isContainAttribute(matcher.group(1))) {
-				html = html.replaceAll("\\{\\{fn-printString: " + matcher.group(1) + "\\}\\}", (String) modelAndView.getAttribute(matcher.group(1)));
+			if (modelAndView.isContainAttribute(matcher.group(1))) {
+				html = html.replaceAll("\\{\\{fn-printString: " + matcher.group(1) + "\\}\\}",
+					(String)modelAndView.getAttribute(matcher.group(1)));
 			}
 		}
 
 		return html;
+	}
+
+	private static String replaceIfNotNullTag(String html, ModelAndView modelAndView) {
+		Pattern regex = Pattern.compile(IF_NOT_NULL_REG_PATTERN);
+		Matcher matcher = regex.matcher(html);
+
+		while (matcher.find()) {
+			if (modelAndView.isContainAttribute(matcher.group(1))) {
+				html = html.replaceAll(replaceMetaToEscape(matcher.group(0)), matcher.group(2));
+			} else {
+				html = html.replaceAll(replaceMetaToEscape(matcher.group(0)), "");
+			}
+		}
+
+		return html;
+	}
+
+	private static String replaceIfNullTag(String html, ModelAndView modelAndView) {
+		Pattern regex = Pattern.compile(IF_NULL_REG_PATTERN);
+		Matcher matcher = regex.matcher(html);
+
+		while (matcher.find()) {
+			if (modelAndView.isContainAttribute(matcher.group(1))) {
+				html = html.replaceAll(replaceMetaToEscape(matcher.group(0)), "");
+			} else {
+				html = html.replaceAll(replaceMetaToEscape(matcher.group(0)), matcher.group(2));
+			}
+		}
+
+		return html;
+	}
+	private static String replaceMetaToEscape(String str) {
+		String pattern = "[{}\\[\\]().*+?^$|\\\\]";
+		return str.replaceAll(pattern, "\\\\$0");
 	}
 
 }
