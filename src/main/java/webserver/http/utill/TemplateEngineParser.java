@@ -75,8 +75,10 @@ public class TemplateEngineParser {
 
 		while (matcher.find()) {
 			if (modelAndView.isContainAttribute(matcher.group(1))) {
-				html = html.replaceAll("\\{\\{fn-printString: " + matcher.group(1) + "\\}\\}",
+				html = html.replaceAll(replaceMetaToEscape(matcher.group(0)),
 					(String)modelAndView.getAttribute(matcher.group(1)));
+			} else {
+				html = html.replaceAll(replaceMetaToEscape(matcher.group(0)), "");
 			}
 		}
 
