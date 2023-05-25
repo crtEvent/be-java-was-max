@@ -1,11 +1,14 @@
 package application.controller;
 
+import java.util.ArrayList;
+
 import application.db.Database;
 import application.model.LoginRequest;
 import application.model.User;
 import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
 import webserver.http.factor.HttpMethod;
+import webserver.http.factor.session.SessionController;
 import webserver.http.factor.session.SessionMap;
 import webserver.http.request.HttpRequestMessage;
 import webserver.model.ModelAndView;
@@ -39,5 +42,21 @@ public class UserController {
 		}
 
 		return new ModelAndView("/user/login_failed.html");
+	}
+
+	@MyRequestMapping(value="/users", method=HttpMethod.GET)
+	public ModelAndView list(HttpRequestMessage httpRequestMessage) {
+		ModelAndView modelAndView = new ModelAndView("/user/list.html");
+
+		User user = (User) SessionController.getSessionValue(httpRequestMessage, "LOGIN_SID");
+
+		if(user != null) {
+			modelAndView.addAttribute("userId", user.getUserId());
+			modelAndView.addAttribute("password", user.getPassword());
+			modelAndView.addAttribute("users", new ArrayList<>(Database.findAll()));
+			return modelAndView;
+		}
+
+		return new ModelAndView("/index.html");
 	}
 }
