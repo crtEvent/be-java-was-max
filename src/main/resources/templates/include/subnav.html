@@ -17,13 +17,13 @@
         </div>
         <div class="collapse navbar-collapse" id="navbar-collapse2">
             <ul class="nav navbar-nav navbar-right">
-                <li class="active"><a href="/index.html">Posts</a></li>
+                <li class="active"><a href="/">Posts</a></li>
                 <li>
                     {{fn-ifNotNull: userId}}<a href="#" role="button">{{fn-printString: userId}}</a>{{/fn-ifNotNull}}
-                    {{fn-ifNull: userId}}<a href="/user/login.html" role="button">로그인</a>{{/fn-ifNull}}
+                    {{fn-ifNull: userId}}<a href="/users/login-page" role="button">로그인</a>{{/fn-ifNull}}
                 </li>
                 <li>
-                    {{fn-ifNull: userId}}<a href="/user/form.html" role="button">회원가입</a>{{/fn-ifNull}}
+                    {{fn-ifNull: userId}}<a href="/users/join-page" role="button">회원가입</a>{{/fn-ifNull}}
                 </li>
                 <li>
                     {{fn-ifNotNull: userId}}<a href="#" role="button">로그아웃</a>{{/fn-ifNotNull}}

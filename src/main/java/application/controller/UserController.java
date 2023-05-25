@@ -16,7 +16,12 @@ import webserver.model.ModelAndView;
 @MyController
 public class UserController {
 
-	@MyRequestMapping(value = "/user/create", method= HttpMethod.GET)
+	@MyRequestMapping(value="/users/join-page", method = HttpMethod.GET)
+	public ModelAndView joinPage(HttpRequestMessage httpRequestMessage) {
+		return new ModelAndView("/user/form.html");
+	}
+
+	@MyRequestMapping(value = "/users", method= HttpMethod.POST)
 	public ModelAndView join(HttpRequestMessage httpRequestMessage) {
 
 		User user = new User(httpRequestMessage.getQueryParam("userId")
@@ -29,7 +34,22 @@ public class UserController {
 		return new ModelAndView("/index.html");
 	}
 
-	@MyRequestMapping(value="/user/login", method = HttpMethod.POST)
+	@MyRequestMapping(value="/users/login-page", method = HttpMethod.GET)
+	public ModelAndView loginPage(HttpRequestMessage httpRequestMessage) {
+		ModelAndView modelAndView = new ModelAndView("/");
+
+		User user = (User) SessionController.getSessionValue(httpRequestMessage, "LOGIN_SID");
+
+		if(user != null) {
+			modelAndView.addAttribute("userId", user.getUserId());
+			modelAndView.addAttribute("password", user.getPassword());
+			return modelAndView;
+		}
+
+		return new ModelAndView("/user/login.html");
+	}
+
+	@MyRequestMapping(value="/users/login", method = HttpMethod.POST)
 	public ModelAndView login(HttpRequestMessage httpRequestMessage) {
 		LoginRequest loginRequest = new LoginRequest(httpRequestMessage.getQueryParam("userId")
 			, httpRequestMessage.getQueryParam("password"));
