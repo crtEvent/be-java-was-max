@@ -36,7 +36,7 @@ public class UserController {
 
 	@MyRequestMapping(value="/users/login-page", method = HttpMethod.GET)
 	public ModelAndView loginPage(HttpRequestMessage httpRequestMessage) {
-		ModelAndView modelAndView = new ModelAndView("/");
+		ModelAndView modelAndView = new ModelAndView("/index.html");
 
 		User user = (User) SessionController.getSessionValue(httpRequestMessage, "LOGIN_SID");
 
