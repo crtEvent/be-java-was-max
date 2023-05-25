@@ -2,7 +2,7 @@ package application.controller;
 
 import java.util.ArrayList;
 
-import application.db.Database;
+import application.db.UserDatabase;
 import application.model.LoginRequest;
 import application.model.User;
 import webserver.annotation.MyController;
@@ -29,7 +29,7 @@ public class UserController {
 			, httpRequestMessage.getQueryParam("name")
 			, httpRequestMessage.getQueryParam("email"));
 
-		Database.addUser(user);
+		UserDatabase.addUser(user);
 
 		return new ModelAndView("/index.html");
 	}
@@ -54,7 +54,7 @@ public class UserController {
 		LoginRequest loginRequest = new LoginRequest(httpRequestMessage.getQueryParam("userId")
 			, httpRequestMessage.getQueryParam("password"));
 
-		User user = Database.findUserById(loginRequest.getUserId());
+		User user = UserDatabase.findUserById(loginRequest.getUserId());
 		if(user != null && user.getPassword().equals(loginRequest.getPassword())) {
 			SessionMap.addSession("LOGIN_SID", user, httpRequestMessage);
 
@@ -73,7 +73,7 @@ public class UserController {
 		if(user != null) {
 			modelAndView.addAttribute("userId", user.getUserId());
 			modelAndView.addAttribute("password", user.getPassword());
-			modelAndView.addAttribute("users", new ArrayList<>(Database.findAll()));
+			modelAndView.addAttribute("users", new ArrayList<>(UserDatabase.findAll()));
 			return modelAndView;
 		}
 

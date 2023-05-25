@@ -7,7 +7,7 @@ import com.google.common.collect.Maps;
 
 import application.model.User;
 
-public class Database {
+public class UserDatabase {
     private static final Map<String, User> users = Maps.newLinkedHashMap();
 
     static {
@@ -23,6 +23,8 @@ public class Database {
                     , "email"+formattedNumber+"@email.com"));
         }
     }
+
+    private UserDatabase() {}
 
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
