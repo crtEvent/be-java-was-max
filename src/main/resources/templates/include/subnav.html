@@ -19,7 +19,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="active"><a href="/">Posts</a></li>
                 <li>
-                    {{fn-ifNotNull: userId}}<a href="#" role="button">{{fn-printString: userId}}</a>{{/fn-ifNotNull}}
+                    {{fn-ifNotNull: userId}}<a href="#" role="button">{{fn-print: userId}}</a>{{/fn-ifNotNull}}
                     {{fn-ifNull: userId}}<a href="/users/login-page" role="button">로그인</a>{{/fn-ifNull}}
                 </li>
                 <li>

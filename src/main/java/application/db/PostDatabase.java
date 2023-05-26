@@ -18,7 +18,7 @@ public class PostDatabase {
 			String formattedNumber = String.format("%03d", i);
 			posts.add(new Post(i
 					, "제목"+formattedNumber
-					, "내용"+formattedNumber
+					, "얼마나 많은 생각이 오갔는지... "+formattedNumber
 					, "user"+formattedNumber
 					, LocalDateTime.now()));
 		}

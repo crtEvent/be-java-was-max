@@ -3,6 +3,7 @@ package application.controller;
 import java.util.ArrayList;
 
 import application.db.PostDatabase;
+import application.model.Post;
 import application.model.PostWriteFormRequest;
 import application.model.User;
 import webserver.annotation.MyController;
@@ -58,6 +59,35 @@ public class PostController {
 		PostDatabase.addPost(postWriteFormRequest);
 
 		return new ModelAndView("/");
+	}
+
+	@MyRequestMapping(value="/posts/view-page",method = HttpMethod.GET)
+	public ModelAndView selectOne(HttpRequestMessage httpRequestMessage){
+		ModelAndView modelAndView = new ModelAndView("/qna/show.html");
+
+		User user = (User)SessionController.getSessionValue(httpRequestMessage, "LOGIN_SID");
+
+		if (user == null) {
+			return new ModelAndView("/user/login.html");
+		}
+
+		modelAndView.addAttribute("userId", user.getUserId());
+		modelAndView.addAttribute("password", user.getPassword());
+
+		try {
+			int postNumber = Integer.parseInt(httpRequestMessage.getQueryParam("postNumber"));
+			Post post = PostDatabase.findPostBy(postNumber-1);
+			modelAndView.addAttribute("title", post.getTitle());
+			modelAndView.addAttribute("content", post.getContent());
+			modelAndView.addAttribute("writer", post.getWriter());
+
+			return modelAndView;
+		} catch (NumberFormatException e) {
+			modelAndView.setView("/index.html");
+			modelAndView.addAttribute("posts", new ArrayList<>(PostDatabase.findAll()));
+			return modelAndView;
+		}
+
 	}
 
 }
