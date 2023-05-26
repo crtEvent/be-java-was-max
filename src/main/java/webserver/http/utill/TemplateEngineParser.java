@@ -22,11 +22,11 @@ public class TemplateEngineParser {
 	private static final Logger logger = LoggerFactory.getLogger(TemplateEngineParser.class);
 
 	private static final String INCLUDE_REG_PATTERN = "\\{\\{fn-include:\\s?(.*?)\\}\\}";
-	private static final String PRINT_STRING_REG_PATTERN = "\\{\\{fn-printString:\\s?(.*?)\\}\\}";
+	private static final String PRINT_STRING_REG_PATTERN = "\\{\\{fn-print:\\s?(.*?)\\}\\}";
 	private static final String IF_NOT_NULL_REG_PATTERN = "\\{\\{fn-ifNotNull:\\s?(.*?)\\}\\}([\\s\\S]*?)\\{\\{/fn-ifNotNull\\}\\}";
 	private static final String IF_NULL_REG_PATTERN = "\\{\\{fn-ifNull:\\s?(.*?)\\}\\}([\\s\\S]*?)\\{\\{/fn-ifNull\\}\\}";
 	private static final String FOREACH_LIST_REG_PATTERN = "\\{\\{fn-forEachList:\\s*(.*?)\\}\\}([\\s\\S]*?)\\{\\{/fn-forEachList\\}\\}";
-	private static final String GET_REG_PATTERN = "\\{\\{fn-get:\\s?(.*?)\\}\\}";
+	private static final String GET_STRING_REG_PATTERN = "\\{\\{fn-get:\\s?(.*?)\\}\\}";
 
 	private TemplateEngineParser() {
 
@@ -87,7 +87,7 @@ public class TemplateEngineParser {
 		while (matcher.find()) {
 			if (modelAndView.isContainAttribute(matcher.group(1))) {
 				html = html.replaceAll(replaceMetaToEscape(matcher.group(0)),
-					(String)modelAndView.getAttribute(matcher.group(1)));
+					String.valueOf(modelAndView.getAttribute(matcher.group(1))));
 			} else {
 				html = html.replaceAll(replaceMetaToEscape(matcher.group(0)), "");
 			}
@@ -153,7 +153,7 @@ public class TemplateEngineParser {
 	}
 
 	public static String replaceGet(String tagBlock, Object object) {
-		Pattern regex = Pattern.compile(GET_REG_PATTERN);
+		Pattern regex = Pattern.compile(GET_STRING_REG_PATTERN);
 		Matcher matcher = regex.matcher(tagBlock);
 
 		while(matcher.find()) {
@@ -170,7 +170,7 @@ public class TemplateEngineParser {
 		for(Method method : methods) {
 			if(parseVariableNameFromGetterMethodName(method.getName()).equals(variableName)) {
 				try {
-					return (String) method.invoke(object);
+					return String.valueOf(method.invoke(object));
 				} catch (IllegalAccessException | InvocationTargetException e) {
 					logger.error("에러: {}", e.getMessage());
 					break;
