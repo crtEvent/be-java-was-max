@@ -1,5 +1,8 @@
 package application.controller;
 
+import java.util.ArrayList;
+
+import application.db.PostDatabase;
 import application.model.User;
 import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
@@ -21,6 +24,8 @@ public class HomeController {
 			modelAndView.addAttribute("userId", user.getUserId());
 			modelAndView.addAttribute("password", user.getPassword());
 		}
+
+		modelAndView.addAttribute("posts", new ArrayList<>(PostDatabase.findAll()));
 
 		return modelAndView;
 	}
