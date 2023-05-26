@@ -3,6 +3,7 @@ package application.controller;
 import java.util.ArrayList;
 
 import application.db.PostDatabase;
+import application.model.PostWriteFormRequest;
 import application.model.User;
 import webserver.annotation.MyController;
 import webserver.annotation.MyRequestMapping;
@@ -42,11 +43,21 @@ public class PostController {
 			return modelAndView;
 		}
 
-		return new ModelAndView("/index.html");
+		modelAndView.setView("/index.html");
+		modelAndView.addAttribute("posts", new ArrayList<>(PostDatabase.findAll()));
+		return modelAndView;
 	}
 
 	@MyRequestMapping(value = "/posts", method = HttpMethod.POST)
 	public ModelAndView write(HttpRequestMessage httpRequestMessage) {
+
+		PostWriteFormRequest postWriteFormRequest = new PostWriteFormRequest(httpRequestMessage.getQueryParam("title")
+			, httpRequestMessage.getQueryParam("content")
+			, httpRequestMessage.getQueryParam("userId"));
+
+		PostDatabase.addPost(postWriteFormRequest);
+
 		return new ModelAndView("/");
 	}
+
 }
