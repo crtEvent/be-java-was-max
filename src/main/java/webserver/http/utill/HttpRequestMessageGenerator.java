@@ -36,7 +36,7 @@ public class HttpRequestMessageGenerator {
 
 		RequestHeader header = generateRequestHeader(requestHeaderLineByLine);
 
-		RequestBody requestBody = generateRequestBody(br, header);
+		RequestBody requestBody = generateRequestBody(header);
 
 		QueryString queryString = generateQueryString(requestLine, requestBody);
 
@@ -82,15 +82,13 @@ public class HttpRequestMessageGenerator {
 		return header;
 	}
 
-	private static RequestBody generateRequestBody(BufferedReader br, RequestHeader header) throws
-		IOException {
+	private static RequestBody generateRequestBody(RequestHeader header) {
 		String contentLength = header.getFieldValue(EntityHeaderType.CONTENT_LENGTH);
 		if(contentLength == null || contentLength.isEmpty()) {
 			return new RequestBody("");
 		}
 
 		char[] body = new char[Integer.parseInt(contentLength)];
-		br.read(body);
 
 		return new RequestBody(new String(body));
 	}
