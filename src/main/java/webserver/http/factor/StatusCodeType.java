@@ -5,7 +5,8 @@ package webserver.http.factor;
 public enum StatusCodeType {
 	OK_200("200", "OK"),
 	FOUND_302("302", "Found"),
-	BAD_REQUEST_400("400", "Bad Request");
+	BAD_REQUEST_400("400", "Bad Request"),
+	NOT_FOUND_404("404", "Not Found");
 
 	private final String codePhrase;
 	private final String reasonPhrase;
@@ -30,5 +31,9 @@ public enum StatusCodeType {
 
 	public String getReasonPhrase() {
 		return reasonPhrase;
+	}
+
+	public String getFullPhrase() {
+		return codePhrase + " " + reasonPhrase;
 	}
 }

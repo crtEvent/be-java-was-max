@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import webserver.config.WebConfig;
+import webserver.http.error.ErrorPageGenerator;
+import webserver.http.factor.StatusCodeType;
 import webserver.model.ModelAndView;
 
 public class TemplateEngineParser {
@@ -44,7 +46,7 @@ public class TemplateEngineParser {
 			return replaceTemplateTag(sb.toString(), modelAndView).getBytes(StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return new byte[] {};
+			return new ErrorPageGenerator().generate(StatusCodeType.NOT_FOUND_404, e);
 		}
 	}
 

@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import webserver.config.WebConfig;
 import webserver.http.factor.HttpMethod;
 import webserver.http.factor.MimeType;
@@ -21,8 +18,6 @@ import webserver.http.response.HttpResponseMessage;
 import webserver.model.ModelAndView;
 
 public class HttpResponseMessageGenerator {
-
-	private static final Logger logger = LoggerFactory.getLogger(HttpResponseMessageGenerator.class);
 
 	private HttpResponseMessageGenerator() {}
 
@@ -86,7 +81,7 @@ public class HttpResponseMessageGenerator {
 		ResponseHeader header = new ResponseHeader();
 
 		if(statusLine.isStatusCodeTypeMatch(StatusCodeType.OK_200)) {
-			header.put(EntityHeaderType.CONTENT_TYPE.getFieldName(), mimeType);
+			header.put(EntityHeaderType.CONTENT_TYPE.getFieldName(), mimeType + ";charset=utf-8");
 			header.put(EntityHeaderType.CONTENT_LENGTH.getFieldName(), String.valueOf(body.getContentLength()));
 		} else if(statusLine.isStatusCodeTypeMatch(StatusCodeType.FOUND_302)) {
 			header.put(ResponseHeaderType.LOCATION.getFieldName(), modelAndView.getView());
