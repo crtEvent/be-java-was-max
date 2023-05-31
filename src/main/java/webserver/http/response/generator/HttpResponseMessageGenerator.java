@@ -1,22 +1,12 @@
 package webserver.http.response.generator;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
-import webserver.http.component.MimeType;
-import webserver.http.component.StatusCodeType;
 import webserver.http.component.body.ResponseBody;
 import webserver.http.component.header.ResponseHeader;
-import webserver.http.component.header.type.EntityHeaderType;
-import webserver.http.component.header.type.ResponseHeaderType;
 import webserver.http.component.start_line.StatusLine;
 import webserver.http.request.HttpRequestMessage;
 import webserver.http.response.HttpResponseMessage;
-import webserver.web.config.WebConfig;
 import webserver.web.model.ModelAndView;
 import webserver.web.utill.ControllerMapper;
-import webserver.web.utill.TemplateEngineParser;
 
 public class HttpResponseMessageGenerator {
 
@@ -25,11 +15,11 @@ public class HttpResponseMessageGenerator {
 	public static HttpResponseMessage generateHttpResponseMessage(HttpRequestMessage httpRequestMessage) {
 		ModelAndView modelAndView = selectRealTargetPath(httpRequestMessage);
 
-		StatusLine statusLine = generateStatusLine(httpRequestMessage, modelAndView);
+		StatusLine statusLine = StatusLineGenerator.generateBy(httpRequestMessage, modelAndView);
 
-		ResponseBody body = generateResponseBody(httpRequestMessage, modelAndView);
+		ResponseBody body = ResponseBodyGenerator.generateBy(httpRequestMessage, modelAndView);
 
-		ResponseHeader header = generateResponseHeader(httpRequestMessage, statusLine, body, modelAndView);
+		ResponseHeader header = ResponseHeaderGenerator.generateBy(httpRequestMessage, statusLine, body, modelAndView);
 
 		return new HttpResponseMessage(statusLine, header, body);
 	}
@@ -43,52 +33,4 @@ public class HttpResponseMessageGenerator {
 		return modelAndView;
 	}
 
-	private static StatusLine generateStatusLine(HttpRequestMessage httpRequestMessage, ModelAndView modelAndView) {
-		StatusCodeType statusCodeType;
-
-		if(modelAndView.isRedirect()) {
-			statusCodeType = StatusCodeType.FOUND_302;
-		} else {
-			statusCodeType = StatusCodeType.OK_200;
-		}
-
-		return new StatusLine(httpRequestMessage.getHttpVersion(), statusCodeType);
-	}
-
-	private static ResponseBody generateResponseBody(HttpRequestMessage httpRequestMessage, ModelAndView modelAndView) {
-		String resourcePath;
-		if (isTextHtmlMimeType(httpRequestMessage.getMimeType())) {
-			resourcePath = WebConfig.getTemplatesResourcePath();
-			return new ResponseBody(TemplateEngineParser.parseHtmlDynamically(new File(resourcePath + modelAndView.getView()).toPath(), modelAndView));
-		} else {
-			resourcePath = WebConfig.getStaticResourcePath();
-			try {
-				return new ResponseBody(Files.readAllBytes(new File(resourcePath + modelAndView.getView()).toPath()));
-			} catch (IOException e) {
-				return new ResponseBody(new byte[]{});
-			}
-		}
-	}
-
-	private static boolean isTextHtmlMimeType(String mimeType) {
-		return MimeType.TEXT_HTML.getTypePhrase().equals(mimeType);
-	}
-
-	private static ResponseHeader generateResponseHeader(HttpRequestMessage httpRequestMessage, StatusLine statusLine, ResponseBody body, ModelAndView modelAndView) {
-		String mimeType = httpRequestMessage.getMimeType();
-
-		ResponseHeader header = new ResponseHeader();
-
-		if(statusLine.isStatusCodeTypeMatch(StatusCodeType.OK_200)) {
-			header.put(EntityHeaderType.CONTENT_TYPE.getFieldName(), mimeType + ";charset=utf-8");
-			header.put(EntityHeaderType.CONTENT_LENGTH.getFieldName(), String.valueOf(body.getContentLength()));
-		} else if(statusLine.isStatusCodeTypeMatch(StatusCodeType.FOUND_302)) {
-			header.put(ResponseHeaderType.LOCATION.getFieldName(), modelAndView.getView());
-			if(httpRequestMessage.getNewCookie() != null) {
-				header.put(ResponseHeaderType.SET_COOKIE.getFieldName(), httpRequestMessage.getNewCookie().getSetCookieResponseHeaderValue());
-			}
-		}
-
-		return header;
-	}
 }
