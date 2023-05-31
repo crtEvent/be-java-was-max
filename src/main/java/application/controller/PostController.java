@@ -57,7 +57,7 @@ public class PostController {
 
 		PostDatabase.addPost(postWriteFormRequest);
 
-		return new ModelAndView("/");
+		return new ModelAndView("redirect:/posts");
 	}
 
 	@MyRequestMapping(value="/posts/view-page",method = HttpMethod.GET)
