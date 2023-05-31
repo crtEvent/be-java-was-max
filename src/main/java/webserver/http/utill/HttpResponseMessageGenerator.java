@@ -37,7 +37,7 @@ public class HttpResponseMessageGenerator {
 		ModelAndView modelAndView = ControllerMapper.runRequestMappingMethod(httpRequestMessage);
 
 		if(modelAndView == null) {
-			modelAndView = new ModelAndView(httpRequestMessage.getRequestTarget());
+			modelAndView = new ModelAndView(httpRequestMessage.getRequestTargetWithoutQueryString());
 		}
 		return modelAndView;
 	}
@@ -57,13 +57,6 @@ public class HttpResponseMessageGenerator {
 		} else {
 			statusCodeType = StatusCodeType.OK_200;
 		}
-
-		/*
-		if(httpMethod == HttpMethod.POST) {
-			statusCodeType = StatusCodeType.FOUND_302;
-		} else {
-			statusCodeType = StatusCodeType.OK_200;
-		}*/
 
 		return new StatusLine(httpRequestMessage.getHttpVersion(), statusCodeType);
 	}
