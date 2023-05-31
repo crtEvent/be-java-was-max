@@ -14,7 +14,7 @@ public class SessionController {
 			String uuid = cookie.getValue();
 			Session session = SessionMap.getSession(uuid);
 
-			return session.getValue();
+			return session != null? session.getValue() : null;
 		}
 
 		return null;
