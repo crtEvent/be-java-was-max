@@ -81,7 +81,8 @@ public class PostController {
 			modelAndView.addAttribute("writer", post.getWriter());
 
 			return modelAndView;
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | IndexOutOfBoundsException e) {
+			e.printStackTrace();
 			modelAndView.setView("redirect:/posts");
 			return modelAndView;
 		}
