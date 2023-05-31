@@ -1,8 +1,8 @@
 package webserver.http.response;
 
-import webserver.http.factor.body.ResponseBody;
-import webserver.http.factor.header.ResponseHeader;
-import webserver.http.factor.start_line.StatusLine;
+import webserver.http.component.body.ResponseBody;
+import webserver.http.component.header.ResponseHeader;
+import webserver.http.component.start_line.StatusLine;
 
 public class HttpResponseMessage {
 	private final StatusLine statusLine;

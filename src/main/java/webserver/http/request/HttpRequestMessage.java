@@ -1,13 +1,13 @@
 package webserver.http.request;
 
-import webserver.http.factor.HttpMethod;
-import webserver.http.factor.QueryString;
-import webserver.http.factor.body.RequestBody;
-import webserver.http.factor.cookie.CookieMap;
-import webserver.http.factor.cookie.NewCookie;
-import webserver.http.factor.header.RequestHeader;
-import webserver.http.factor.header.type.RequestHeaderType;
-import webserver.http.factor.start_line.RequestLine;
+import webserver.http.component.HttpMethod;
+import webserver.http.component.QueryString;
+import webserver.http.component.body.RequestBody;
+import webserver.http.component.cookie.CookieMap;
+import webserver.http.component.cookie.NewCookie;
+import webserver.http.component.header.RequestHeader;
+import webserver.http.component.header.type.RequestHeaderType;
+import webserver.http.component.start_line.RequestLine;
 
 public class HttpRequestMessage {
 	private final RequestLine requestLine;

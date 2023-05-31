@@ -11,11 +11,11 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import webserver.config.WebConfig;
+import webserver.web.config.WebConfig;
 import webserver.http.request.HttpRequestMessage;
-import webserver.http.utill.ControllerMapper;
-import webserver.http.utill.HttpRequestMessageGenerator;
-import webserver.model.ModelAndView;
+import webserver.web.utill.ControllerMapper;
+import webserver.http.request.generator.HttpRequestMessageGenerator;
+import webserver.web.model.ModelAndView;
 
 class HttpRequestMessageTest {
 

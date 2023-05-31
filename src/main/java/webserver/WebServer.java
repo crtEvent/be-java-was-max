@@ -6,8 +6,8 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import webserver.config.WebConfig;
-import webserver.http.utill.ControllerMapper;
+import webserver.web.config.WebConfig;
+import webserver.web.utill.ControllerMapper;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);

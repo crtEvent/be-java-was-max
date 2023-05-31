@@ -6,12 +6,12 @@ import application.db.PostDatabase;
 import application.model.Post;
 import application.model.PostWriteFormRequest;
 import application.model.User;
-import webserver.annotation.MyController;
-import webserver.annotation.MyRequestMapping;
-import webserver.http.factor.HttpMethod;
-import webserver.http.factor.session.SessionController;
+import webserver.web.annotation.MyController;
+import webserver.web.annotation.MyRequestMapping;
+import webserver.http.component.HttpMethod;
+import webserver.web.session.SessionController;
 import webserver.http.request.HttpRequestMessage;
-import webserver.model.ModelAndView;
+import webserver.web.model.ModelAndView;
 
 @MyController
 public class PostController {
