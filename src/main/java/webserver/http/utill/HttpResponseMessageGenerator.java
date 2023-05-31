@@ -72,7 +72,6 @@ public class HttpResponseMessageGenerator {
 		return MimeType.TEXT_HTML.getTypePhrase().equals(mimeType);
 	}
 
-
 	private static ResponseHeader generateResponseHeader(HttpRequestMessage httpRequestMessage, StatusLine statusLine, ResponseBody body, ModelAndView modelAndView) {
 		String mimeType = httpRequestMessage.getMimeType();
 
