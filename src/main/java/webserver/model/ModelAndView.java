@@ -5,12 +5,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModelAndView {
+	private static final String REDIRECT_DELIMITER = "redirect:";
 
 	private String view;
+	private boolean redirect = false;
 	private final Map<String, Object> model = new HashMap<>();
 
 	public ModelAndView(String view) {
-		this.view = view;
+		this.view = initView(view);
+	}
+
+	private String initView(String view) {
+		String[] split = view.split(REDIRECT_DELIMITER);
+
+		if(split.length == 2) {
+			this.redirect = true;
+			return split[1];
+		}
+		return view;
 	}
 
 	public String getView() {
@@ -18,7 +30,11 @@ public class ModelAndView {
 	}
 
 	public void setView(String view) {
-		this.view = view;
+		this.view = initView(view);
+	}
+
+	public boolean isRedirect() {
+		return redirect;
 	}
 
 	public void addAttribute(String name, Object value) {

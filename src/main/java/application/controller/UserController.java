@@ -31,12 +31,12 @@ public class UserController {
 
 		UserDatabase.addUser(user);
 
-		return new ModelAndView("/index.html");
+		return new ModelAndView("redirect:/users/login-page");
 	}
 
 	@MyRequestMapping(value="/users/login-page", method = HttpMethod.GET)
 	public ModelAndView loginPage(HttpRequestMessage httpRequestMessage) {
-		ModelAndView modelAndView = new ModelAndView("/index.html");
+		ModelAndView modelAndView = new ModelAndView("redirect:/posts");
 
 		User user = (User) SessionController.getSessionValue(httpRequestMessage, "LOGIN_SID");
 
@@ -49,6 +49,21 @@ public class UserController {
 		return new ModelAndView("/user/login.html");
 	}
 
+	@MyRequestMapping(value="/users/login-page-failed", method = HttpMethod.GET)
+	public ModelAndView loginPageFailed(HttpRequestMessage httpRequestMessage) {
+		ModelAndView modelAndView = new ModelAndView("redirect:/posts");
+
+		User user = (User) SessionController.getSessionValue(httpRequestMessage, "LOGIN_SID");
+
+		if(user != null) {
+			modelAndView.addAttribute("userId", user.getUserId());
+			modelAndView.addAttribute("password", user.getPassword());
+			return modelAndView;
+		}
+
+		return new ModelAndView("/user/login_failed.html");
+	}
+
 	@MyRequestMapping(value="/users/login", method = HttpMethod.POST)
 	public ModelAndView login(HttpRequestMessage httpRequestMessage) {
 		LoginRequest loginRequest = new LoginRequest(httpRequestMessage.getQueryParam("userId")
@@ -58,10 +73,10 @@ public class UserController {
 		if(user != null && user.getPassword().equals(loginRequest.getPassword())) {
 			SessionMap.addSession("LOGIN_SID", user, httpRequestMessage);
 
-			return new ModelAndView("/");
+			return new ModelAndView("redirect:/posts");
 		}
 
-		return new ModelAndView("/user/login_failed.html");
+		return new ModelAndView("redirect:/users/login-page-failed");
 	}
 
 	@MyRequestMapping(value="/users", method=HttpMethod.GET)
@@ -77,6 +92,6 @@ public class UserController {
 			return modelAndView;
 		}
 
-		return new ModelAndView("/index.html");
+		return new ModelAndView("redirect:/users/login-page");
 	}
 }

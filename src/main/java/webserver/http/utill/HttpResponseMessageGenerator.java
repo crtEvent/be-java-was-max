@@ -24,7 +24,7 @@ public class HttpResponseMessageGenerator {
 	public static HttpResponseMessage generateHttpResponseMessage(HttpRequestMessage httpRequestMessage) {
 		ModelAndView modelAndView = selectRealTargetPath(httpRequestMessage);
 
-		StatusLine statusLine = generateStatusLine(httpRequestMessage);
+		StatusLine statusLine = generateStatusLine(httpRequestMessage, modelAndView);
 
 		ResponseBody body = generateResponseBody(httpRequestMessage, modelAndView);
 
@@ -42,15 +42,28 @@ public class HttpResponseMessageGenerator {
 		return modelAndView;
 	}
 
-	private static StatusLine generateStatusLine(HttpRequestMessage httpRequestMessage) {
+	private static boolean isRedirectPath(ModelAndView modelAndView) {
+		String[] split = modelAndView.getView().split("redirect:");
+		return split.length == 2;
+	}
+
+	private static StatusLine generateStatusLine(HttpRequestMessage httpRequestMessage, ModelAndView modelAndView) {
 		HttpMethod httpMethod = httpRequestMessage.getMethod();
 		StatusCodeType statusCodeType;
 
-		if(httpMethod == HttpMethod.POST) {
+
+		if(modelAndView.isRedirect()) {
 			statusCodeType = StatusCodeType.FOUND_302;
 		} else {
 			statusCodeType = StatusCodeType.OK_200;
 		}
+
+		/*
+		if(httpMethod == HttpMethod.POST) {
+			statusCodeType = StatusCodeType.FOUND_302;
+		} else {
+			statusCodeType = StatusCodeType.OK_200;
+		}*/
 
 		return new StatusLine(httpRequestMessage.getHttpVersion(), statusCodeType);
 	}

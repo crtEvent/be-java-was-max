@@ -44,8 +44,7 @@ public class PostController {
 			return modelAndView;
 		}
 
-		modelAndView.setView("/index.html");
-		modelAndView.addAttribute("posts", new ArrayList<>(PostDatabase.findAll()));
+		modelAndView.setView("redirect:/users/login-page");
 		return modelAndView;
 	}
 
@@ -68,7 +67,7 @@ public class PostController {
 		User user = (User)SessionController.getSessionValue(httpRequestMessage, "LOGIN_SID");
 
 		if (user == null) {
-			return new ModelAndView("/user/login.html");
+			return new ModelAndView("redirect:/users/login-page");
 		}
 
 		modelAndView.addAttribute("userId", user.getUserId());
@@ -83,8 +82,7 @@ public class PostController {
 
 			return modelAndView;
 		} catch (NumberFormatException e) {
-			modelAndView.setView("/index.html");
-			modelAndView.addAttribute("posts", new ArrayList<>(PostDatabase.findAll()));
+			modelAndView.setView("redirect:/posts");
 			return modelAndView;
 		}
 
