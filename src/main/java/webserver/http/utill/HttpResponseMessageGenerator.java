@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import webserver.config.WebConfig;
-import webserver.http.factor.HttpMethod;
 import webserver.http.factor.MimeType;
 import webserver.http.factor.StatusCodeType;
 import webserver.http.factor.body.ResponseBody;
@@ -42,15 +41,8 @@ public class HttpResponseMessageGenerator {
 		return modelAndView;
 	}
 
-	private static boolean isRedirectPath(ModelAndView modelAndView) {
-		String[] split = modelAndView.getView().split("redirect:");
-		return split.length == 2;
-	}
-
 	private static StatusLine generateStatusLine(HttpRequestMessage httpRequestMessage, ModelAndView modelAndView) {
-		HttpMethod httpMethod = httpRequestMessage.getMethod();
 		StatusCodeType statusCodeType;
-
 
 		if(modelAndView.isRedirect()) {
 			statusCodeType = StatusCodeType.FOUND_302;
